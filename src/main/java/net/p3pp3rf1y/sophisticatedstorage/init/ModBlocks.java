@@ -42,14 +42,8 @@ import net.p3pp3rf1y.sophisticatedcore.util.BlockItemBase;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.*;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.LimitedBarrelScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.LimitedBarrelSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
-import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.LimitedBarrelSettingsContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
-import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageSettingsContainerMenu;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.*;
+import net.p3pp3rf1y.sophisticatedstorage.common.gui.*;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.*;
 import net.p3pp3rf1y.sophisticatedstorage.item.BarrelBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
@@ -61,7 +55,8 @@ import java.util.function.Supplier;
 public class ModBlocks {
 	private static final String LIMITED_BARREL_NAME = "limited_barrel";
 
-	private ModBlocks() {}
+	private ModBlocks() {
+	}
 
 	public static final TagKey<Item> BASE_TIER_WOODEN_STORAGE_TAG = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), SophisticatedStorage.getRL("base_tier_wooden_storage"));
 	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, SophisticatedStorage.MOD_ID);
@@ -168,7 +163,7 @@ public class ModBlocks {
 
 	private static final String CHEST_REG_NAME = "chest";
 	public static final RegistryObject<ChestBlock> CHEST = BLOCKS.register(CHEST_REG_NAME, () -> new ChestBlock(Config.SERVER.woodChest.inventorySlotCount, Config.SERVER.woodChest.upgradeSlotCount));
-    public static final RegistryObject<ChestBlock> COPPER_CHEST = BLOCKS.register("copper_chest", () -> new ChestBlock(Config.SERVER.copperChest.inventorySlotCount, Config.SERVER.copperChest.upgradeSlotCount));
+	public static final RegistryObject<ChestBlock> COPPER_CHEST = BLOCKS.register("copper_chest", () -> new ChestBlock(Config.SERVER.copperChest.inventorySlotCount, Config.SERVER.copperChest.upgradeSlotCount));
 	public static final RegistryObject<ChestBlock> IRON_CHEST = BLOCKS.register("iron_chest", () -> new ChestBlock(Config.SERVER.ironChest.inventorySlotCount, Config.SERVER.ironChest.upgradeSlotCount));
 	public static final RegistryObject<ChestBlock> GOLD_CHEST = BLOCKS.register("gold_chest", () -> new ChestBlock(Config.SERVER.goldChest.inventorySlotCount, Config.SERVER.goldChest.upgradeSlotCount));
 	public static final RegistryObject<ChestBlock> DIAMOND_CHEST = BLOCKS.register("diamond_chest", () -> new ChestBlock(Config.SERVER.diamondChest.inventorySlotCount, Config.SERVER.diamondChest.upgradeSlotCount));
@@ -182,7 +177,7 @@ public class ModBlocks {
 
 	private static final String SHULKER_BOX_REG_NAME = "shulker_box";
 	public static final RegistryObject<ShulkerBoxBlock> SHULKER_BOX = BLOCKS.register(SHULKER_BOX_REG_NAME, () -> new ShulkerBoxBlock(Config.SERVER.shulkerBox.inventorySlotCount, Config.SERVER.shulkerBox.upgradeSlotCount));
-    public static final RegistryObject<ShulkerBoxBlock> COPPER_SHULKER_BOX = BLOCKS.register("copper_shulker_box", () -> new ShulkerBoxBlock(Config.SERVER.copperShulkerBox.inventorySlotCount, Config.SERVER.copperShulkerBox.upgradeSlotCount));
+	public static final RegistryObject<ShulkerBoxBlock> COPPER_SHULKER_BOX = BLOCKS.register("copper_shulker_box", () -> new ShulkerBoxBlock(Config.SERVER.copperShulkerBox.inventorySlotCount, Config.SERVER.copperShulkerBox.upgradeSlotCount));
 	public static final RegistryObject<ShulkerBoxBlock> IRON_SHULKER_BOX = BLOCKS.register("iron_shulker_box", () -> new ShulkerBoxBlock(Config.SERVER.ironShulkerBox.inventorySlotCount, Config.SERVER.ironShulkerBox.upgradeSlotCount));
 	public static final RegistryObject<ShulkerBoxBlock> GOLD_SHULKER_BOX = BLOCKS.register("gold_shulker_box", () -> new ShulkerBoxBlock(Config.SERVER.goldShulkerBox.inventorySlotCount, Config.SERVER.goldShulkerBox.upgradeSlotCount));
 	public static final RegistryObject<ShulkerBoxBlock> DIAMOND_SHULKER_BOX = BLOCKS.register("diamond_shulker_box", () -> new ShulkerBoxBlock(Config.SERVER.diamondShulkerBox.inventorySlotCount, Config.SERVER.diamondShulkerBox.upgradeSlotCount));
@@ -220,6 +215,10 @@ public class ModBlocks {
 	public static final RegistryObject<BlockItem> STORAGE_IO_ITEM = ITEMS.register(STORAGE_IO_REG_NAME, () -> new BlockItemBase(STORAGE_IO.get(), new Item.Properties()));
 	public static final RegistryObject<BlockItem> STORAGE_INPUT_ITEM = ITEMS.register(STORAGE_INPUT_REG_NAME, () -> new BlockItemBase(STORAGE_INPUT.get(), new Item.Properties()));
 	public static final RegistryObject<BlockItem> STORAGE_OUTPUT_ITEM = ITEMS.register(STORAGE_OUTPUT_REG_NAME, () -> new BlockItemBase(STORAGE_OUTPUT.get(), new Item.Properties()));
+
+	public static final Supplier<DecorationTableBlock> DECORATION_TABLE = BLOCKS.register("decoration_table", DecorationTableBlock::new);
+
+	public static final Supplier<BlockItem> DECORATION_TABLE_ITEM = ITEMS.register("decoration_table", () -> new BlockItemBase(DECORATION_TABLE.get(), new Properties()));
 
 	@SuppressWarnings("ConstantConditions") //no datafixer type needed
 	public static final RegistryObject<BlockEntityType<BarrelBlockEntity>> BARREL_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register(BARREL_REG_NAME, () ->
@@ -271,6 +270,10 @@ public class ModBlocks {
 			BlockEntityType.Builder.of(StorageOutputBlockEntity::new, STORAGE_OUTPUT.get())
 					.build(null));
 
+	public static final RegistryObject<BlockEntityType<DecorationTableBlockEntity>> DECORATION_TABLE_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register("decoration_table", () ->
+			BlockEntityType.Builder.of(DecorationTableBlockEntity::new, DECORATION_TABLE.get())
+					.build(null));
+
 	public static final RegistryObject<MenuType<StorageContainerMenu>> STORAGE_CONTAINER_TYPE = MENU_TYPES.register("storage",
 			() -> IForgeMenuType.create(StorageContainerMenu::fromBuffer));
 
@@ -282,6 +285,9 @@ public class ModBlocks {
 
 	public static final RegistryObject<MenuType<LimitedBarrelSettingsContainerMenu>> LIMITED_BARREL_SETTINGS_CONTAINER_TYPE = MENU_TYPES.register("limited_barrel_settings",
 			() -> IForgeMenuType.create(LimitedBarrelSettingsContainerMenu::fromBuffer));
+
+	public static final Supplier<MenuType<DecorationTableMenu>> DECORATION_TABLE_CONTAINER_TYPE = MENU_TYPES.register("decoration_table",
+			() -> IForgeMenuType.create(DecorationTableMenu::fromBuffer));
 
 	private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, SophisticatedStorage.MOD_ID);
 	public static final RegistryObject<SimpleCraftingRecipeSerializer<?>> STORAGE_DYE_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("storage_dye", () -> new SimpleCraftingRecipeSerializer<>(StorageDyeRecipe::new));
@@ -319,6 +325,7 @@ public class ModBlocks {
 			MenuScreens.register(SETTINGS_CONTAINER_TYPE.get(), StorageSettingsScreen::constructScreen);
 			MenuScreens.register(LIMITED_BARREL_CONTAINER_TYPE.get(), LimitedBarrelScreen::new);
 			MenuScreens.register(LIMITED_BARREL_SETTINGS_CONTAINER_TYPE.get(), LimitedBarrelSettingsScreen::new);
+			MenuScreens.register(DECORATION_TABLE_CONTAINER_TYPE.get(), DecorationTableScreen::new);
 		});
 	}
 
@@ -388,6 +395,7 @@ public class ModBlocks {
 	@SuppressWarnings("java:S6548") //singleton is correct here
 	public static class WoodStorageCauldronInteraction extends StorageCauldronInteraction {
 		private static final WoodStorageCauldronInteraction INSTANCE = new WoodStorageCauldronInteraction();
+
 		@Override
 		protected void removePaint(ItemStack stack) {
 			super.removePaint(stack);
