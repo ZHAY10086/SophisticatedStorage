@@ -2,9 +2,7 @@ package net.p3pp3rf1y.sophisticatedstorage.data;
 
 import net.minecraft.data.BlockFamily;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.SpecialRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.BlockItem;
@@ -70,6 +68,16 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.requires(Items.PAPER)
 				.unlockedBy("has_slime", has(Tags.Items.SLIMEBALLS))
 				.condition(new DropPackedDisabledCondition())
+				.save(consumer);
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.DECORATION_TABLE_ITEM.get())
+				.pattern("LLL")
+				.pattern("PBP")
+				.pattern("P P")
+				.define('L', ItemTags.LOGS)
+				.define('P', ItemTags.PLANKS)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy("has_upgrade_base", has(ModItems.UPGRADE_BASE.get()))
 				.save(consumer);
 	}
 
