@@ -119,7 +119,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 				(InventoryHelper.isEmpty(decorativeBlocks)
 						|| !(storage.getItem() instanceof BarrelBlockItem)
 						|| isTintedStorage(storage)
-				) && colorsTransparentOrSameAs(storage))) { //TODO once dyes and materials can be combined make sure to create combined result here
+				) && colorsTransparentOrSameAs(storage))) {
 			result = ItemStack.EMPTY;
 			return;
 		}
@@ -139,7 +139,6 @@ public class DecorationTableBlockEntity extends BlockEntity {
 			return;
 		}
 
-		//TODO remove the check for tinted barrel here once barrel model can support combination of tinted and material
 		if (InventoryHelper.isEmpty(decorativeBlocks)) {
 			result = ItemStack.EMPTY;
 			return;
@@ -157,7 +156,6 @@ public class DecorationTableBlockEntity extends BlockEntity {
 			return;
 		}
 
-		//TODO if dyed and any of the parts doesn't have material make sure that dye shows
 		result = storage.copy();
 		result.setCount(1);
 
@@ -390,7 +388,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	}
 
 	public void consumeIngredientsOnCraft() {
-		if (InventoryHelper.isEmpty(decorativeBlocks)) { //TODO once dyes and materials can be combined make sure to consume from both here and change the dye calculation to only count with parts visible
+		if (InventoryHelper.isEmpty(decorativeBlocks)) {
 			consumeDyes();
 		} else {
 			consumeMaterials();
@@ -565,5 +563,11 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 	public Map<ResourceLocation, Integer> getPartsStored() {
 		return remainingParts;
+	}
+
+	public void dropContents() {
+		InventoryHelper.dropItems(decorativeBlocks, level, worldPosition);
+		InventoryHelper.dropItems(dyes, level, worldPosition);
+		InventoryHelper.dropItems(storageBlock, level, worldPosition);
 	}
 }

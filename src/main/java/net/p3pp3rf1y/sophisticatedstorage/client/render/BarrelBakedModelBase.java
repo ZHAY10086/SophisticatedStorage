@@ -772,7 +772,7 @@ public abstract class BarrelBakedModelBase implements IDynamicBakedModel {
 			boolean hasAccentColor = StorageBlockItem.getAccentColorFromStack(stack).isPresent();
 			Map<BarrelMaterial, ResourceLocation> materials = BarrelBlockItem.getMaterials(stack);
 			String woodName = WoodStorageBlockItem.getWoodType(stack).map(WoodType::name)
-					.orElse(barrelBakedModel.barrelHasAccentColor && barrelBakedModel.barrelHasMainColor && materials.isEmpty() ? null : WoodType.ACACIA.name()); //TODO possibly remove materials check from here if a separate dynamic model is going to be used for materials
+					.orElse(barrelBakedModel.barrelHasAccentColor && barrelBakedModel.barrelHasMainColor && materials.isEmpty() ? null : WoodType.ACACIA.name());
 			boolean packed = WoodStorageBlockItem.isPacked(stack);
 			boolean barrelShowsTier = StorageBlockItem.showsTier(stack);
 			Item item = stack.getItem();
