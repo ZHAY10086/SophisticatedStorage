@@ -1,6 +1,7 @@
 package net.p3pp3rf1y.sophisticatedstorage.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -36,6 +37,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.LimitedBarrelBlock;
+import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
+import net.p3pp3rf1y.sophisticatedstorage.client.gui.PaintbrushOverlay;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageTranslationHelper;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.ToolInfoOverlay;
@@ -47,6 +50,7 @@ import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.PaintbrushItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageContentsTooltip;
 import net.p3pp3rf1y.sophisticatedstorage.network.ScrolledToolMessage;
 import net.p3pp3rf1y.sophisticatedstorage.network.StoragePacketHandler;
@@ -111,11 +115,12 @@ public class ClientEventHandler {
 	private static void onRenderHighlight(RenderHighlightEvent.Block event) {
 		Minecraft minecraft = Minecraft.getInstance();
 		LocalPlayer player = minecraft.player;
-		if (player == null) {
+		if (player == null || minecraft.screen != null) {
 			return;
 		}
 
-		if (player.getMainHandItem().getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(player.getMainHandItem())) {
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(stack)) {
 			BlockHitResult hitresult = event.getTarget();
 			BlockPos otherPos = hitresult.getBlockPos().relative(player.getDirection().getClockWise());
 			Level level = player.level();
@@ -125,6 +130,26 @@ public class ClientEventHandler {
 				Vec3 cameraPos = event.getCamera().getPosition();
 				LevelRenderer.renderShape(event.getPoseStack(), vertexConsumer, blockState.getShape(level, otherPos, CollisionContext.of(event.getCamera().getEntity())),
 						otherPos.getX() - cameraPos.x, otherPos.getY() - cameraPos.y, otherPos.getZ() - cameraPos.z, 0.0F, 0.0F, 0.0F, 0.4F);
+			}
+		}
+
+		if (stack.getItem() instanceof PaintbrushItem) {
+			BlockHitResult hitresult = event.getTarget();
+			Level level = player.level();
+			BlockPos pos = hitresult.getBlockPos();
+			BlockState blockState = level.getBlockState(pos);
+
+			if (blockState.getBlock() instanceof StorageBlockBase || blockState.getBlock() == ModBlocks.CONTROLLER.get()) {
+				PaintbrushOverlay.getItemRequirementsFor(stack, player, level, pos).ifPresent(itemRequirements -> {
+					float red = !itemRequirements.itemsMissing().isEmpty() ? 1 : 0;
+					float green = itemRequirements.itemsMissing().isEmpty() ? 1 : 0;
+					VertexConsumer vertexConsumer = event.getMultiBufferSource().getBuffer(RenderType.lines());
+					Vec3 cameraPos = event.getCamera().getPosition();
+					PoseStack poseStack = event.getPoseStack();
+					LevelRenderer.renderShape(poseStack, vertexConsumer, blockState.getShape(level, pos, CollisionContext.of(event.getCamera().getEntity())),
+							pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z, red, green, 0.0F, 1);
+					event.setCanceled(true);
+				});
 			}
 		}
 	}
@@ -246,6 +271,7 @@ public class ClientEventHandler {
 
 	private static void registerOverlay(RegisterGuiOverlaysEvent event) {
 		event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "storage_tool_info", ToolInfoOverlay.HUD_TOOL_INFO);
+		event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "paintbrush_info", PaintbrushOverlay.HUD_PAINTBRUSH_INFO);
 	}
 
 	private static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
