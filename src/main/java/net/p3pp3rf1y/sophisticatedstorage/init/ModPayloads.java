@@ -9,7 +9,7 @@ public class ModPayloads {
 	private ModPayloads() {
 	}
 
-	public static void registerPackets(final RegisterPayloadHandlersEvent event) {
+	public static void registerPayloads(final RegisterPayloadHandlersEvent event) {
 		final PayloadRegistrar registrar = event.registrar(SophisticatedStorage.MOD_ID).versioned("1.0");
 		registrar.playToServer(OpenStorageInventoryPayload.TYPE, OpenStorageInventoryPayload.STREAM_CODEC, OpenStorageInventoryPayload::handlePayload);
 		registrar.playToServer(RequestStorageContentsPayload.TYPE, RequestStorageContentsPayload.STREAM_CODEC, RequestStorageContentsPayload::handlePayload);

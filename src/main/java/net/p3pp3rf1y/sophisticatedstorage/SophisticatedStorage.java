@@ -33,7 +33,7 @@ public class SophisticatedStorage {
 		}
 		ModBlocks.registerHandlers(modBus);
 		ModItems.registerHandlers(modBus);
-		modBus.addListener(ModPayloads::registerPackets);
+		modBus.addListener(ModPayloads::registerPayloads);
 		modBus.addListener(SophisticatedStorage::setup);
 		modBus.addListener(DataGenerators::gatherData);
 		ModParticles.registerParticles(modBus);
