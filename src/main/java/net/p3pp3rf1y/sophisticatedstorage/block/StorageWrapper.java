@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -53,20 +52,21 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	private CompoundTag settingsNbt = new CompoundTag();
 	private final SettingsHandler settingsHandler;
 	private final RenderInfo renderInfo;
+
 	private CompoundTag renderInfoNbt = new CompoundTag();
 
 	@Nullable
 	protected UUID contentsUuid = null;
 
 	private int openTabId = -1;
-	protected int numberOfInventorySlots = 0;
 
+	protected int numberOfInventorySlots = 0;
 	protected int numberOfUpgradeSlots = -1;
+
 	private SortBy sortBy = SortBy.NAME;
 	private int columnsTaken = 0;
 	private int mainColor = -1;
 	private int accentColor = -1;
-
 	private Runnable upgradeCachesInvalidatedHandler = () -> {
 	};
 
@@ -191,9 +191,9 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		return tag;
 	}
 
-	public void load(HolderLookup.Provider registries, CompoundTag tag) {
+	public void load(CompoundTag tag) {
 		loadContents(tag);
-		loadData(registries, tag);
+		loadData(tag);
 
 		initInventoryHandler();
 		getUpgradeHandler().refreshUpgradeWrappers();
@@ -202,11 +202,11 @@ public abstract class StorageWrapper implements IStorageWrapper {
 		}
 	}
 
-	private void loadData(HolderLookup.Provider registries, CompoundTag tag) {
+	private void loadData(CompoundTag tag) {
 		settingsNbt = tag.getCompound("settings");
 		settingsHandler.reloadFrom(settingsNbt);
 		renderInfoNbt = tag.getCompound("renderInfo");
-		renderInfo.deserializeFrom(registries, renderInfoNbt);
+		renderInfo.deserializeFrom(renderInfoNbt);
 		contentsUuid = NBTHelper.getTagValue(tag, UUID_TAG, CompoundTag::get).map(NbtUtils::loadUUID).orElse(null);
 		openTabId = NBTHelper.getInt(tag, OPEN_TAB_ID_TAG).orElse(-1);
 		sortBy = NBTHelper.getString(tag, "sortBy").map(SortBy::fromName).orElse(SortBy.NAME);
@@ -229,7 +229,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	@Override
-	public void setSaveHandler(Runnable saveHandler) {
+	public void setContentsChangeHandler(Runnable contentsChangeHandler) {
 		//noop
 	}
 

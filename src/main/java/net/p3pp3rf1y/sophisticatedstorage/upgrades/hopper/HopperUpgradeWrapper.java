@@ -3,7 +3,7 @@ package net.p3pp3rf1y.sophisticatedstorage.upgrades.hopper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,7 +54,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	@Override
-	public void tick(@Nullable LivingEntity entity, Level level, BlockPos pos) {
+	public void tick(@Nullable Entity entity, Level level, BlockPos pos) {
 		initDirections(level, pos);
 
 		if (coolDownTime > level.getGameTime()) {
