@@ -4,9 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -62,13 +64,13 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		}
 
 		for (Direction pushDirection : pushDirections) {
-			if (runOnItemHandlers(level, pos, pushDirection, this::pushItems)) {
+			if (runOnItemHandlers(level, pos, pushDirection, this::pushItems, entity == null)) {
 				break;
 			}
 		}
 
 		for (Direction pullDirection : pullDirections) {
-			if (runOnItemHandlers(level, pos, pullDirection, this::pullItems)) {
+			if (runOnItemHandlers(level, pos, pullDirection, this::pullItems, entity == null)) {
 				break;
 			}
 		}
@@ -87,6 +89,8 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			pullDirections.clear();
 			pushDirections.clear();
 			initDirections(BlockSide.BOTTOM.toDirection(horizontalDirection, verticalFacing), BlockSide.TOP.toDirection(horizontalDirection, verticalFacing));
+		} else {
+			initDirections(Direction.DOWN, Direction.UP);
 		}
 	}
 
@@ -157,6 +161,11 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			return;
 		}
 
+		ItemHandlerHolder itemHandlers = getItemHandlerHolder(level, pos, direction, serverLevel);
+		handlerCache.put(direction, itemHandlers);
+	}
+
+	private ItemHandlerHolder getItemHandlerHolder(Level level, BlockPos pos, Direction direction, ServerLevel serverLevel) {
 		WeakReference<HopperUpgradeWrapper> existRef = new WeakReference<>(this);
 
 		BlockState storageState = level.getBlockState(pos);
@@ -175,20 +184,45 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 
 			caches.add(BlockCapabilityCache.create(Capabilities.ItemHandler.BLOCK, serverLevel, offsetPos, direction.getOpposite(), () -> existRef.get() != null, () -> updateCacheOnSide(level, pos, direction)));
 		});
-		handlerCache.put(direction, new ItemHandlerHolder(caches, refreshOnEveryNeighborChange.get()));
+		return new ItemHandlerHolder(caches, refreshOnEveryNeighborChange.get());
 	}
 
-	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run) {
-		if (!handlerCache.containsKey(direction)) {
-			updateCacheOnSide(level, pos, direction);
-		}
-		if (handlerCache.get(direction) == null) {
-			return false;
+	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run, boolean useCache) {
+		ItemHandlerHolder holder = getItemHandlerHolder(level, pos, direction, useCache);
+		if (holder == null) {
+			return runOnAutomationEntityItemHandlers(level, pos, direction, run);
 		}
 
-		List<IItemHandler> handler = handlerCache.get(direction).handlers().stream().map(BlockCapabilityCache::getCapability).filter(Objects::nonNull).toList();
+		List<IItemHandler> handler = holder.handlers().stream().map(BlockCapabilityCache::getCapability).filter(Objects::nonNull).toList();
 
-		return run.test(handler);
+		return handler.isEmpty() ? runOnAutomationEntityItemHandlers(level, pos, direction, run) : run.test(handler);
+	}
+
+	private boolean runOnAutomationEntityItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run) {
+		List<Entity> entities = level.getEntities((Entity)null, new AABB(pos.relative(direction)), EntitySelector.ENTITY_STILL_ALIVE);
+		if (!entities.isEmpty()) {
+			Collections.shuffle(entities);
+			for (Entity entity : entities) {
+				IItemHandler entityCap = entity.getCapability(Capabilities.ItemHandler.ENTITY_AUTOMATION, direction.getOpposite());
+				if (entityCap != null) {
+					return run.test(List.of(entityCap));
+				}
+			}
+		}
+
+		return false;
+	}
+
+	@Nullable
+	private ItemHandlerHolder getItemHandlerHolder(Level level, BlockPos pos, Direction direction, boolean useCache) {
+		if (useCache) {
+			if (!handlerCache.containsKey(direction)) {
+				updateCacheOnSide(level, pos, direction);
+			}
+			return handlerCache.get(direction);
+		}
+
+		return getItemHandlerHolder(level, pos, direction, (ServerLevel) level);
 	}
 
 	public ContentsFilterLogic getInputFilterLogic() {
