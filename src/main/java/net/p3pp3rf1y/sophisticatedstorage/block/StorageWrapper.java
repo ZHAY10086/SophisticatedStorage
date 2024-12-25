@@ -40,6 +40,8 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	public static final String CONTENTS_TAG = "contents";
 	public static final String NUMBER_OF_INVENTORY_SLOTS_TAG = "numberOfInventorySlots";
 	public static final String NUMBER_OF_UPGRADE_SLOTS_TAG = "numberOfUpgradeSlots";
+	public static final String SETTINGS_TAG = "settings";
+	public static final String RENDER_INFO_TAG = "renderInfo";
 	private final Supplier<Runnable> getSaveHandler;
 
 	@Nullable
@@ -161,10 +163,10 @@ public abstract class StorageWrapper implements IStorageWrapper {
 
 	CompoundTag saveData(CompoundTag tag) {
 		if (!settingsNbt.isEmpty()) {
-			tag.put("settings", settingsNbt);
+			tag.put(SETTINGS_TAG, settingsNbt);
 		}
 		if (!renderInfoNbt.isEmpty()) {
-			tag.put("renderInfo", renderInfoNbt);
+			tag.put(RENDER_INFO_TAG, renderInfoNbt);
 		}
 		if (contentsUuid != null) {
 			tag.put(UUID_TAG, NbtUtils.createUUID(contentsUuid));
@@ -203,9 +205,9 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	private void loadData(CompoundTag tag) {
-		settingsNbt = tag.getCompound("settings");
+		settingsNbt = tag.getCompound(SETTINGS_TAG);
 		settingsHandler.reloadFrom(settingsNbt);
-		renderInfoNbt = tag.getCompound("renderInfo");
+		renderInfoNbt = tag.getCompound(RENDER_INFO_TAG);
 		renderInfo.deserializeFrom(renderInfoNbt);
 		contentsUuid = NBTHelper.getTagValue(tag, UUID_TAG, CompoundTag::get).map(NbtUtils::loadUUID).orElse(null);
 		openTabId = NBTHelper.getInt(tag, OPEN_TAB_ID_TAG).orElse(-1);
