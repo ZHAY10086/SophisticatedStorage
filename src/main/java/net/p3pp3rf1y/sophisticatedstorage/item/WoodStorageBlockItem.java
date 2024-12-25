@@ -13,6 +13,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.extensions.IDataComponentHolderExtension;
 import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModDataComponents;
@@ -75,7 +76,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 
     @Override
     public void setMainColor(ItemStack storageStack, int mainColor) {
-        if (StorageBlockItem.getAccentColorFromStack(storageStack).isPresent()) {
+        if (StorageBlockItem.getAccentColorFromComponentHolder(storageStack).isPresent()) {
             removeWoodType(storageStack);
         }
         super.setMainColor(storageStack, mainColor);
@@ -83,7 +84,7 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 
     @Override
     public void setAccentColor(ItemStack storageStack, int accentColor) {
-        if (StorageBlockItem.getMainColorFromStack(storageStack).isPresent()) {
+        if (StorageBlockItem.getMainColorFromComponentHolder(storageStack).isPresent()) {
             removeWoodType(storageStack);
         }
         super.setAccentColor(storageStack, accentColor);
@@ -93,8 +94,8 @@ public class WoodStorageBlockItem extends StorageBlockItem {
         storageStack.remove(ModDataComponents.WOOD_TYPE);
     }
 
-    public static Optional<WoodType> getWoodType(ItemStack storageStack) {
-        return Optional.ofNullable(storageStack.get(ModDataComponents.WOOD_TYPE));
+    public static Optional<WoodType> getWoodType(IDataComponentHolderExtension componentHolder) {
+        return Optional.ofNullable(componentHolder.get(ModDataComponents.WOOD_TYPE));
     }
 
     public static ItemStack setWoodType(ItemStack storageStack, WoodType woodType) {

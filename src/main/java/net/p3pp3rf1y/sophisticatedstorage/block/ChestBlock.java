@@ -193,8 +193,8 @@ public class ChestBlock extends WoodStorageBlockBase implements SimpleWaterlogge
 		Direction direction = context.getHorizontalDirection().getOpposite();
 		StackStorageWrapper wrapper = StackStorageWrapper.fromStack(context.getLevel().registryAccess(), chestBeingPlaced);
 		return getStateForPlacement(context, direction, fluidstate,
-				StorageBlockItem.getMainColorFromStack(chestBeingPlaced).orElse(-1),
-				StorageBlockItem.getAccentColorFromStack(chestBeingPlaced).orElse(-1),
+				StorageBlockItem.getMainColorFromComponentHolder(chestBeingPlaced).orElse(-1),
+				StorageBlockItem.getAccentColorFromComponentHolder(chestBeingPlaced).orElse(-1),
 				WoodStorageBlockItem.getWoodType(chestBeingPlaced).orElse(WoodType.ACACIA),
 				wrapper.hasContents() && InventoryHelper.isEmpty(wrapper.getUpgradeHandler()));
 	}
