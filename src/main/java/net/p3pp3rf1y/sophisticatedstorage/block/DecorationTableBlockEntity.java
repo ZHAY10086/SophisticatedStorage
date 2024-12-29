@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.Tags;
@@ -50,7 +51,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		@Override
 		public boolean isItemValid(int slot, ItemStack stack) {
-			return stack.getItem() instanceof BlockItem && !(stack.getItem() instanceof StorageBlockItem);
+			return stack.getItem() instanceof BlockItem blockItem && !(stack.getItem() instanceof StorageBlockItem) && Block.isShapeFullBlock(blockItem.getBlock().defaultBlockState().getShape(level, BlockPos.ZERO));
 		}
 	};
 
