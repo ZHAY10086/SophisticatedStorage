@@ -33,11 +33,15 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class StorageWrapper implements IStorageWrapper {
-	private static final String MAIN_COLOR_TAG = "mainColor";
-	private static final String ACCENT_COLOR_TAG = "accentColor";
-	private static final String UUID_TAG = "uuid";
-	private static final String OPEN_TAB_ID_TAG = "openTabId";
+	public static final String MAIN_COLOR_TAG = "mainColor";
+	public static final String ACCENT_COLOR_TAG = "accentColor";
+	public static final String UUID_TAG = "uuid";
+	public static final String OPEN_TAB_ID_TAG = "openTabId";
 	public static final String CONTENTS_TAG = "contents";
+	public static final String NUMBER_OF_INVENTORY_SLOTS_TAG = "numberOfInventorySlots";
+	public static final String NUMBER_OF_UPGRADE_SLOTS_TAG = "numberOfUpgradeSlots";
+	public static final String SETTINGS_TAG = "settings";
+	public static final String RENDER_INFO_TAG = "renderInfo";
 	private final Supplier<Runnable> getSaveHandler;
 
 	@Nullable
@@ -226,7 +230,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 	}
 
 	@Override
-	public void setSaveHandler(Runnable saveHandler) {
+	public void setContentsChangeHandler(Runnable saveHandler) {
 		//noop
 	}
 

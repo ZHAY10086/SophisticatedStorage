@@ -72,6 +72,10 @@ public class BarrelBlockEntity extends WoodStorageBlockEntity {
 		this(pos, state, ModBlocks.BARREL_BLOCK_ENTITY_TYPE.get());
 	}
 
+	public void setDynamicRenderTracker(IDynamicRenderTracker dynamicRenderTracker) {
+		this.dynamicRenderTracker = dynamicRenderTracker;
+	}
+
 	void updateOpenBlockState(BlockState state, boolean open) {
 		if (level == null) {
 			return;

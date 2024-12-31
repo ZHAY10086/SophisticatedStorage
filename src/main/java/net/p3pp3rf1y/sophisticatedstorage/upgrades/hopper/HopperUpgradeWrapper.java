@@ -4,12 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.WorldlyContainerHolder;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
@@ -60,7 +63,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 	}
 
 	@Override
-	public void tick(@Nullable LivingEntity entity, Level level, BlockPos pos) {
+	public void tick(@Nullable Entity entity, Level level, BlockPos pos) {
 		initDirections(level, pos);
 
 		if (coolDownTime > level.getGameTime()) {
@@ -69,7 +72,7 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 
 		for (Direction pushDirection : pushDirections) {
 			boolean done = false;
-			for (LazyOptional<IItemHandler> itemHandler : getItemHandlers(level, pos, pushDirection)) {
+			for (LazyOptional<IItemHandler> itemHandler : getItemHandlers(level, pos, pushDirection, entity == null)) {
 				if (itemHandler.map(this::pushItems).orElse(false)) {
 					done = true;
 					break;
@@ -82,11 +85,17 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 					}
 				}
 			}
+
+			if (!done) {
+				getEntityContainer(level, pos, pushDirection, entity).ifPresent(container -> {
+					pushItemsToContainer(container, pushDirection.getOpposite());
+				});
+			}
 		}
 
 		for (Direction pullDirection : pullDirections) {
 			boolean done = false;
-			for (LazyOptional<IItemHandler> itemHandler : getItemHandlers(level, pos, pullDirection)) {
+			for (LazyOptional<IItemHandler> itemHandler : getItemHandlers(level, pos, pullDirection, entity == null)) {
 				if (itemHandler.map(this::pullItems).orElse(false)) {
 					done = true;
 					break;
@@ -96,16 +105,38 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			if (!done) {
 				for (WorldlyContainer worldlyContainer : getWorldlyContainers(level, pos, pullDirection)) {
 					if (pullItemsFromContainer(worldlyContainer, pullDirection.getOpposite())) {
+						done = true;
 						break;
 					}
 				}
+			}
+
+			if (!done) {
+				getEntityContainer(level, pos, pullDirection, entity).ifPresent(container -> {
+					pullItemsFromContainer(container, pullDirection.getOpposite());
+				});
 			}
 		}
 
 		coolDownTime = level.getGameTime() + upgradeItem.getTransferSpeedTicks();
 	}
 
-	private boolean pushItemsToContainer(WorldlyContainer worldlyContainer, Direction face) {
+	private Optional<Container> getEntityContainer(Level level, BlockPos pos, Direction direction, @Nullable Entity entity) {
+		BlockState storageState = level.getBlockState(pos);
+		List<BlockPos> offsetPositions = entity == null && storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : List.of(pos.relative(direction));
+
+		List<Entity> entities = new ArrayList<>();
+		for (BlockPos offsetPosition : offsetPositions) {
+			entities.addAll(level.getEntities((Entity)null, new AABB(offsetPosition), e -> e != entity && EntitySelector.CONTAINER_ENTITY_SELECTOR.test(e)));
+		}
+		if (!entities.isEmpty()) {
+			Collections.shuffle(entities);
+			return Optional.of((Container) entities.get(0));
+		}
+		return Optional.empty();
+	}
+
+	private boolean pushItemsToContainer(Container worldlyContainer, Direction face) {
 		ITrackedContentsItemHandler fromHandler = storageWrapper.getInventoryForUpgradeProcessing();
 
 		outputFilterLogic.setInventory(EmptyHandler.INSTANCE);
@@ -122,21 +153,21 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		return false;
 	}
 
-	private boolean pushStackToContainer(WorldlyContainer worldlyContainer, Direction face, ItemStack extractedStack, ITrackedContentsItemHandler fromHandler, int slotToExtractFrom) {
-		for (int containerSlot = 0; containerSlot < worldlyContainer.getContainerSize(); containerSlot++) {
-			if (worldlyContainer.canPlaceItemThroughFace(containerSlot, extractedStack, face)) {
-				ItemStack existingStack = worldlyContainer.getItem(containerSlot);
+	private boolean pushStackToContainer(Container container, Direction face, ItemStack extractedStack, ITrackedContentsItemHandler fromHandler, int slotToExtractFrom) {
+		for (int containerSlot = 0; containerSlot < container.getContainerSize(); containerSlot++) {
+			if (!(container instanceof WorldlyContainer worldlyContainer) || worldlyContainer.canPlaceItemThroughFace(containerSlot, extractedStack, face)) {
+				ItemStack existingStack = container.getItem(containerSlot);
 				if (existingStack.isEmpty()) {
-					worldlyContainer.setItem(containerSlot, extractedStack);
+					container.setItem(containerSlot, extractedStack);
 					fromHandler.extractItem(slotToExtractFrom, extractedStack.getCount(), false);
 					return true;
 				} else if (ItemHandlerHelper.canItemStacksStack(existingStack, extractedStack)) {
-					int maxStackSize = Math.min(worldlyContainer.getMaxStackSize(), existingStack.getMaxStackSize());
+					int maxStackSize = Math.min(container.getMaxStackSize(), existingStack.getMaxStackSize());
 					int remainder = maxStackSize - existingStack.getCount();
 					if (remainder > 0) {
 						int countToExtract = Math.min(extractedStack.getCount(), remainder);
 						existingStack.grow(countToExtract);
-						worldlyContainer.setItem(containerSlot, existingStack);
+						container.setItem(containerSlot, existingStack);
 						fromHandler.extractItem(slotToExtractFrom, countToExtract, false);
 						return true;
 					}
@@ -146,15 +177,20 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		return false;
 	}
 
-	private boolean pullItemsFromContainer(WorldlyContainer worldlyContainer, Direction face) {
+	private boolean pullItemsFromContainer(Container container, Direction face) {
 		ITrackedContentsItemHandler toHandler = storageWrapper.getInventoryForUpgradeProcessing();
-		for (int containerSlot = 0; containerSlot < worldlyContainer.getContainerSize(); containerSlot++) {
-			ItemStack existingStack = worldlyContainer.getItem(containerSlot);
-			if (!existingStack.isEmpty() && worldlyContainer.canTakeItemThroughFace(containerSlot, existingStack, face) && inputFilterLogic.matchesFilter(existingStack)) {
-				ItemStack remainingStack = InventoryHelper.insertIntoInventory(existingStack, toHandler, false);
+		for (int containerSlot = 0; containerSlot < container.getContainerSize(); containerSlot++) {
+			ItemStack stackToInsert = container.getItem(containerSlot).copy();
+			if (stackToInsert.getCount() > upgradeItem.getMaxTransferStackSize()) {
+				stackToInsert.setCount(upgradeItem.getMaxTransferStackSize());
+			}
+			if (!stackToInsert.isEmpty()
+					&& (!(container instanceof WorldlyContainer worldlyContainer) || worldlyContainer.canTakeItemThroughFace(containerSlot, stackToInsert, face))
+					&& inputFilterLogic.matchesFilter(stackToInsert)) {
+				ItemStack remainingStack = InventoryHelper.insertIntoInventory(stackToInsert, toHandler, false);
 
-				if (remainingStack.getCount() < existingStack.getCount()) {
-					worldlyContainer.setItem(containerSlot, remainingStack);
+				if (remainingStack.getCount() < stackToInsert.getCount()) {
+					container.removeItem(containerSlot, stackToInsert.getCount() - remainingStack.getCount());
 					return true;
 				}
 			}
@@ -175,6 +211,8 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 			pushDirections.clear();
 			initDirections(BlockSide.BOTTOM.toDirection(horizontalDirection, verticalFacing), BlockSide.TOP.toDirection(horizontalDirection, verticalFacing));
 			directionsInitialized = true;
+		} else {
+			initDirections(Direction.DOWN, Direction.UP);
 		}
 	}
 
@@ -268,9 +306,11 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		handlerCache.put(direction, new ItemHandlerHolder(caches, refreshOnEveryNeighborChange.get()));
 	}
 
-	private List<LazyOptional<IItemHandler>> getItemHandlers(Level level, BlockPos pos, Direction direction) {
-		if (!handlerCache.containsKey(direction)) {
-			updateCacheOnSide(level, pos, direction);
+	private List<LazyOptional<IItemHandler>> getItemHandlers(Level level, BlockPos pos, Direction direction, boolean useCache) {
+		if (useCache) {
+			if (!handlerCache.containsKey(direction)) {
+				updateCacheOnSide(level, pos, direction);
+			}
 		}
 		return handlerCache.containsKey(direction) ? handlerCache.get(direction).handlers() : Collections.emptyList();
 	}
