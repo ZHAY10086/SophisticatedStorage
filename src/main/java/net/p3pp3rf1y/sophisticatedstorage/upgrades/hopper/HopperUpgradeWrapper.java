@@ -187,19 +187,25 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 		return new ItemHandlerHolder(caches, refreshOnEveryNeighborChange.get());
 	}
 
-	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run, boolean useCache) {
-		ItemHandlerHolder holder = getItemHandlerHolder(level, pos, direction, useCache);
+	private boolean runOnItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run, boolean isRunningInBlock) {
+		ItemHandlerHolder holder = getItemHandlerHolder(level, pos, direction, isRunningInBlock);
 		if (holder == null) {
-			return runOnAutomationEntityItemHandlers(level, pos, direction, run);
+			return runOnAutomationEntityItemHandlers(level, pos, direction, run, isRunningInBlock);
 		}
 
 		List<IItemHandler> handler = holder.handlers().stream().map(BlockCapabilityCache::getCapability).filter(Objects::nonNull).toList();
 
-		return handler.isEmpty() ? runOnAutomationEntityItemHandlers(level, pos, direction, run) : run.test(handler);
+		return handler.isEmpty() ? runOnAutomationEntityItemHandlers(level, pos, direction, run, isRunningInBlock) : run.test(handler);
 	}
 
-	private boolean runOnAutomationEntityItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run) {
-		List<Entity> entities = level.getEntities((Entity)null, new AABB(pos.relative(direction)), EntitySelector.ENTITY_STILL_ALIVE);
+	private boolean runOnAutomationEntityItemHandlers(Level level, BlockPos pos, Direction direction, Predicate<List<IItemHandler>> run, boolean isRunningInBlock) {
+		BlockState storageState = level.getBlockState(pos);
+		List<BlockPos> offsetPositions = isRunningInBlock && storageState.getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNeighborPos(storageState, pos, direction) : List.of(pos.relative(direction));
+
+		List<Entity> entities = new ArrayList<>();
+		for (BlockPos offsetPosition : offsetPositions) {
+			entities.addAll(level.getEntities((Entity)null, new AABB(offsetPosition), EntitySelector.ENTITY_STILL_ALIVE));
+		}
 		if (!entities.isEmpty()) {
 			Collections.shuffle(entities);
 			for (Entity entity : entities) {
