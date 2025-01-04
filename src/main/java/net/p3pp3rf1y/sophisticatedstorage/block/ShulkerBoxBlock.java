@@ -21,11 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -164,7 +160,7 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 	public void addCreativeTabItems(Consumer<ItemStack> itemConsumer) {
 		itemConsumer.accept(new ItemStack(this));
 
-		if (this == ModBlocks.SHULKER_BOX.get() || Boolean.TRUE.equals(Config.CLIENT.showHigherTierTintedVariants.get())) {
+		if (this == ModBlocks.SHULKER_BOX.get() || Boolean.TRUE.equals(!Config.CLIENT_SPEC.isLoaded() || Config.CLIENT.showHigherTierTintedVariants.get())) {
 			for (DyeColor color : DyeColor.values()) {
 				ItemStack storageStack = getTintedStack(color);
 				itemConsumer.accept(storageStack);
