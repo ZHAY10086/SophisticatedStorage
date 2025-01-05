@@ -155,7 +155,10 @@ public class HopperUpgradeWrapper extends UpgradeWrapperBase<HopperUpgradeWrappe
 
 	private boolean pushStackToContainer(Container container, Direction face, ItemStack extractedStack, ITrackedContentsItemHandler fromHandler, int slotToExtractFrom) {
 		for (int containerSlot = 0; containerSlot < container.getContainerSize(); containerSlot++) {
-			if (!(container instanceof WorldlyContainer worldlyContainer) || worldlyContainer.canPlaceItemThroughFace(containerSlot, extractedStack, face)) {
+
+			boolean canPlaceItem = container instanceof WorldlyContainer worldlyContainer ? worldlyContainer.canPlaceItemThroughFace(containerSlot, extractedStack, face) : container.canPlaceItem(containerSlot, extractedStack);
+
+			if (canPlaceItem) {
 				ItemStack existingStack = container.getItem(containerSlot);
 				if (existingStack.isEmpty()) {
 					container.setItem(containerSlot, extractedStack);
