@@ -119,6 +119,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.AUTO_BLASTING_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.AUTO_BLASTING_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STONECUTTER_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STONECUTTER_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.JUKEBOX_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.JUKEBOX_UPGRADE.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.ADVANCED_JUKEBOX_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_JUKEBOX_UPGRADE.get());
 
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_STARTER_TIER.get(), ModItems.STACK_UPGRADE_TIER_1_PLUS.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_1.get(), ModItems.STACK_UPGRADE_TIER_2.get());
@@ -146,7 +147,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.AUTO_BLASTING_UPGRADE.get(), ModItems.AUTO_BLASTING_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STONECUTTER_UPGRADE.get(), ModItems.STONECUTTER_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.JUKEBOX_UPGRADE.get(), ModItems.JUKEBOX_UPGRADE.get());
-
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_JUKEBOX_UPGRADE.get(), ModItems.ADVANCED_JUKEBOX_UPGRADE.get());
 	}
 
 	private void addBackpackStackUpgradeFromStorageStackUpgradeRecipe(RecipeOutput recipeOutput, StackUpgradeItem backpackStackUpgrade, StackUpgradeItem storageStackUpgrade) {
@@ -849,6 +850,17 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('I', Tags.Items.INGOTS_IRON)
 				.define('J', Items.JUKEBOX)
 				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_JUKEBOX_UPGRADE.get())
+				.pattern(" D ")
+				.pattern("GJG")
+				.pattern("RRR")
+				.define('D', Tags.Items.GEMS_DIAMOND)
+				.define('G', Tags.Items.INGOTS_GOLD)
+				.define('R', Tags.Items.DUSTS_REDSTONE)
+				.define('J', ModItems.JUKEBOX_UPGRADE.get())
+				.unlockedBy("has_jukebox_upgrade", has(ModItems.JUKEBOX_UPGRADE.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.ADVANCED_FEEDING_UPGRADE.get(), UpgradeNextTierRecipe::new)
