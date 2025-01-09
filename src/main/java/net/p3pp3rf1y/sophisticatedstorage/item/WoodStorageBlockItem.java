@@ -123,23 +123,8 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 
 			private void initWrapper() {
 				if (wrapper == null) {
-					UUID uuid = NBTHelper.getUniqueId(stack, "uuid").orElse(null);
-					StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
-						@Override
-						public String getStorageType() {
-							return "wood_storage"; //isn't really relevant because wooden storage can't have its gui open when in item form
-						}
-
-						@Override
-						public Component getDisplayName() {
-							return Component.empty(); //isn't really relevant because wooden storage can't have its gui open when in item form
-						}
-
-						@Override
-						protected boolean isAllowedInStorage(ItemStack stack) {
-							return false;
-						}
-					};
+					UUID uuid = getContentsUuid(stack).orElse(null);
+					StorageWrapper storageWrapper = new StackStorageWrapper(stack);
 					if (uuid != null) {
 						CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
 						storageWrapper.load(compoundtag);
@@ -166,13 +151,5 @@ public class WoodStorageBlockItem extends StorageBlockItem {
 			return Component.translatable(descriptionId, "", "");
 		}
 		return Component.translatable(descriptionId, Component.translatable("wood_name.sophisticatedstorage." + woodType.name().toLowerCase(Locale.ROOT)), " ");
-	}
-
-	public static void setNumberOfInventorySlots(ItemStack storageStack, int numberOfInventorySlots) {
-		NBTHelper.putInt(storageStack.getOrCreateTag(), "numberOfInventorySlots", numberOfInventorySlots);
-	}
-
-	public static  void setNumberOfUpgradeSlots(ItemStack storageStack, int numberOfUpgradeSlots) {
-		NBTHelper.putInt(storageStack.getOrCreateTag(), "numberOfUpgradeSlots", numberOfUpgradeSlots);
 	}
 }

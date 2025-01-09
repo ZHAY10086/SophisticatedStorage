@@ -30,9 +30,7 @@ import net.p3pp3rf1y.sophisticatedcore.client.gui.utils.TranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.settings.memory.MemorySettingsCategory;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
-import net.p3pp3rf1y.sophisticatedstorage.Config;
 import net.p3pp3rf1y.sophisticatedstorage.block.ItemContentsStorage;
-import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.client.render.ShulkerBoxItemRenderer;
@@ -129,23 +127,7 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 			private void initWrapper() {
 				if (wrapper == null) {
 					UUID uuid = getContentsUuid(stack).orElse(null);
-					StorageWrapper storageWrapper = new StackStorageWrapper(stack) {
-						@Override
-						public String getStorageType() {
-							return "shulker_box";
-						}
-
-						@Override
-						public Component getDisplayName() {
-							return Component.translatable(ShulkerBoxItem.this.getDescriptionId());
-						}
-
-						@Override
-						protected boolean isAllowedInStorage(ItemStack stack) {
-							Block block = Block.byItem(stack.getItem());
-							return !(block instanceof ShulkerBoxBlock) && !(block instanceof net.minecraft.world.level.block.ShulkerBoxBlock) && !Config.SERVER.shulkerBoxDisallowedItems.isItemDisallowed(stack.getItem());
-						}
-					};
+					StorageWrapper storageWrapper = new StackStorageWrapper(stack);
 					if (uuid != null) {
 						CompoundTag compoundtag = ItemContentsStorage.get().getOrCreateStorageContents(uuid).getCompound(StorageBlockEntity.STORAGE_WRAPPER_TAG);
 						storageWrapper.load(compoundtag);
@@ -155,10 +137,6 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 				}
 			}
 		};
-	}
-
-	private Optional<UUID> getContentsUuid(ItemStack stack) {
-		return NBTHelper.getUniqueId(stack, "uuid");
 	}
 
 	@Override
@@ -189,22 +167,14 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		}).orElse(StashResult.NO_SPACE);
 	}
 
-	public void setNumberOfInventorySlots(ItemStack shulkerBoxStack, int numberOfInventorySlots) {
-		NBTHelper.putInt(shulkerBoxStack.getOrCreateTag(), "numberOfInventorySlots", numberOfInventorySlots);
-	}
-
-	public int getNumberOfInventorySlots(ItemStack shulkerBoxStack) {
+	public int getNumberOfInventorySlotsOrDefault(ItemStack shulkerBoxStack) {
 		int defaultNumberOfInventorySlots = shulkerBoxStack.getCapability(CapabilityStorageWrapper.getCapabilityInstance()).map(StorageWrapper::getDefaultNumberOfInventorySlots).orElse(1);
 		return NBTHelper.getInt(shulkerBoxStack, "numberOfInventorySlots").map(inventorySlots -> Math.max(inventorySlots, defaultNumberOfInventorySlots)).orElse(defaultNumberOfInventorySlots);
 	}
 
-	public int getNumberOfUpgradeSlots(ItemStack shulkerBoxStack) {
+	public int getNumberOfUpgradeSlotsOrDefault(ItemStack shulkerBoxStack) {
 		int defaultNumberOfUpgradeSlots = shulkerBoxStack.getCapability(CapabilityStorageWrapper.getCapabilityInstance()).map(StorageWrapper::getDefaultNumberOfUpgradeSlots).orElse(1);
 		return NBTHelper.getInt(shulkerBoxStack, "numberOfUpgradeSlots").map(numberOfUpgradeSlots -> Math.max(numberOfUpgradeSlots, defaultNumberOfUpgradeSlots)).orElse(defaultNumberOfUpgradeSlots);
-	}
-
-	public void setNumberOfUpgradeSlots(ItemStack shulkerBoxStack, int numberOfUpgradeSlots) {
-		NBTHelper.putInt(shulkerBoxStack.getOrCreateTag(), "numberOfUpgradeSlots", numberOfUpgradeSlots);
 	}
 
 	@Override

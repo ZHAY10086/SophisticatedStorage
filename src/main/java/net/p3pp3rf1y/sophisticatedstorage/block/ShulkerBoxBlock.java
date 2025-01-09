@@ -141,8 +141,8 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 				storageWrapper.setAccentColor(shulkerBoxItem.getAccentColor(stack).orElse(-1));
 				InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
 				UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
-				storageWrapper.changeSize(shulkerBoxItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlots(),
-						shulkerBoxItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlots());
+				storageWrapper.changeSize(shulkerBoxItem.getNumberOfInventorySlotsOrDefault(stack) - inventoryHandler.getSlots(),
+						shulkerBoxItem.getNumberOfUpgradeSlotsOrDefault(stack) - upgradeHandler.getSlots());
 			}
 
 			be.getStorageWrapper().onInit();
@@ -238,8 +238,8 @@ public class ShulkerBoxBlock extends StorageBlockBase implements IAdditionalDrop
 			if (accentColor > -1) {
 				shulkerBoxItem.setAccentColor(stack, accentColor);
 			}
-			shulkerBoxItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlots());
-			shulkerBoxItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlots());
+			StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlots());
+			StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlots());
 		}
 	}
 
