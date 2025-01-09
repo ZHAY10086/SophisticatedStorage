@@ -6,14 +6,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
-import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
+import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
 import net.p3pp3rf1y.sophisticatedstorage.block.IStorageBlock;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-import net.p3pp3rf1y.sophisticatedstorage.item.ShulkerBoxItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
-import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
+import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
 import java.util.Optional;
 
@@ -26,11 +25,6 @@ public class StorageTierUpgradeShapelessRecipe extends ShapelessRecipe implement
 	}
 
 	@Override
-	public boolean matches(CraftingInput input, Level level) {
-		return super.matches(input, level) && getOriginalStorage(input).map(storage -> !(storage.getItem() instanceof WoodStorageBlockItem) || !WoodStorageBlockItem.isPacked(storage)).orElse(false);
-	}
-
-	@Override
 	public ShapelessRecipe getCompose() {
 		return compose;
 	}
@@ -39,10 +33,10 @@ public class StorageTierUpgradeShapelessRecipe extends ShapelessRecipe implement
 	public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
 		ItemStack upgradedStorage = super.assemble(input, registries);
 		getOriginalStorage(input).ifPresent(originalStorage -> upgradedStorage.applyComponents(originalStorage.getComponents()));
-		if (upgradedStorage.getItem() instanceof ShulkerBoxItem shulkerBoxItem) {
-			StackStorageWrapper wrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
-			shulkerBoxItem.setNumberOfInventorySlots(upgradedStorage, wrapper.getDefaultNumberOfInventorySlots());
-			shulkerBoxItem.setNumberOfUpgradeSlots(upgradedStorage, wrapper.getDefaultNumberOfUpgradeSlots());
+		if (upgradedStorage.has(ModCoreDataComponents.STORAGE_UUID)) {
+			StackStorageWrapper storageWrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
+			StorageBlockItem.setNumberOfInventorySlots(upgradedStorage, storageWrapper.getDefaultNumberOfInventorySlots());
+			StorageBlockItem.setNumberOfUpgradeSlots(upgradedStorage, storageWrapper.getDefaultNumberOfUpgradeSlots());
 		}
 		return upgradedStorage;
 	}

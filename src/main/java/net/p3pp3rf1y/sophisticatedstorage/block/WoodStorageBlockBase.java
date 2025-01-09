@@ -22,6 +22,8 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
+import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeHandler;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
@@ -73,8 +75,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				}
 				WoodStorageBlockItem.setPacked(stack, true);
 				StorageBlockItem.setShowsTier(stack, be.shouldShowTier());
-				WoodStorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlots());
-				WoodStorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlots());
+				StorageBlockItem.setNumberOfInventorySlots(stack, storageWrapper.getInventoryHandler().getSlots());
+				StorageBlockItem.setNumberOfUpgradeSlots(stack, storageWrapper.getUpgradeHandler().getSlots());
 			}
 		}
 	}
@@ -156,6 +158,8 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 				be.setBeingUpgraded(true);
 				be.loadAdditional(itemContentsStorage.getOrCreateStorageContents(storageUuid), level.registryAccess());
 				itemContentsStorage.removeStorageContents(storageUuid);
+
+				setNewSize(stack, be);
 			}
 
 			if (stack.has(DataComponents.CUSTOM_NAME)) {
@@ -171,6 +175,14 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 			}
 			be.setBeingUpgraded(false);
 		});
+	}
+
+	private void setNewSize(ItemStack stack, WoodStorageBlockEntity be) {
+		StorageWrapper storageWrapper = be.getStorageWrapper();
+		InventoryHandler inventoryHandler = storageWrapper.getInventoryHandler();
+		UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
+		storageWrapper.changeSize(StorageBlockItem.getNumberOfInventorySlots(stack) - inventoryHandler.getSlots(),
+				StorageBlockItem.getNumberOfUpgradeSlots(stack) - upgradeHandler.getSlots());
 	}
 
 	protected void setRenderBlockRenderProperties(ItemStack stack, WoodStorageBlockEntity be) {

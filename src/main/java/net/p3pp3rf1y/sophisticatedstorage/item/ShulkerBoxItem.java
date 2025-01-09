@@ -104,10 +104,6 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 		return StashResult.SPACE;
 	}
 
-	public void setNumberOfInventorySlots(ItemStack shulkerBoxStack, int numberOfInventorySlots) {
-		shulkerBoxStack.set(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, numberOfInventorySlots);
-	}
-
 	public int getNumberOfInventorySlots(HolderLookup.Provider registries, ItemStack shulkerBoxStack) {
 		int defaultNumberOfInventorySlots = StackStorageWrapper.fromStack(registries, shulkerBoxStack).getDefaultNumberOfInventorySlots();
 		return Math.max(shulkerBoxStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_INVENTORY_SLOTS, defaultNumberOfInventorySlots), defaultNumberOfInventorySlots);
@@ -116,10 +112,6 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 	public int getNumberOfUpgradeSlots(HolderLookup.Provider registries, ItemStack shulkerBoxStack) {
 		int defaultNumberOfUpgradeSlots = StackStorageWrapper.fromStack(registries, shulkerBoxStack).getDefaultNumberOfUpgradeSlots();
 		return Math.max(shulkerBoxStack.getOrDefault(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, defaultNumberOfUpgradeSlots), defaultNumberOfUpgradeSlots);
-	}
-
-	public void setNumberOfUpgradeSlots(ItemStack shulkerBoxStack, int numberOfUpgradeSlots) {
-		shulkerBoxStack.set(ModCoreDataComponents.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
 	}
 
 	@Override
