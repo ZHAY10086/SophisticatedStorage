@@ -187,8 +187,7 @@ public abstract class WoodStorageBlockBase extends StorageBlockBase implements I
 
 	protected void setRenderBlockRenderProperties(ItemStack stack, WoodStorageBlockEntity be) {
 		WoodStorageBlockItem.getWoodType(stack).ifPresent(be::setWoodType);
-		StorageBlockItem.getMainColorFromComponentHolder(stack).ifPresent(be.getStorageWrapper()::setMainColor);
-		StorageBlockItem.getAccentColorFromComponentHolder(stack).ifPresent(be.getStorageWrapper()::setAccentColor);
+		be.getStorageWrapper().setColors(StorageBlockItem.getMainColorFromComponentHolder(stack).orElse(-1), StorageBlockItem.getAccentColorFromComponentHolder(stack).orElse(-1));
 	}
 
 	@Override
