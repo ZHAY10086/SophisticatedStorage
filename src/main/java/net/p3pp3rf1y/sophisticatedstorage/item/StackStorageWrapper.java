@@ -110,4 +110,33 @@ public class StackStorageWrapper extends StorageWrapper {
 		Block block = Block.byItem(stack.getItem());
 		return !(block instanceof ShulkerBoxBlock) && !(block instanceof net.minecraft.world.level.block.ShulkerBoxBlock) && !Config.SERVER.shulkerBoxDisallowedItems.isItemDisallowed(stack.getItem());
 	}
+
+	@Override
+	public void setColors(int mainColor, int accentColor) {
+		NBTHelper.setInteger(storageStack, StorageWrapper.MAIN_COLOR_TAG, mainColor);
+		NBTHelper.setInteger(storageStack, StorageWrapper.ACCENT_COLOR_TAG, accentColor);
+		save();
+	}
+
+	@Override
+	public int getMainColor() {
+		return NBTHelper.getInt(storageStack, StorageWrapper.MAIN_COLOR_TAG).orElse(-1);
+	}
+
+
+	@Override
+	public boolean hasMainColor() {
+		return NBTHelper.hasTag(storageStack, StorageWrapper.MAIN_COLOR_TAG);
+	}
+
+	@Override
+	public int getAccentColor() {
+		return NBTHelper.getInt(storageStack, StorageWrapper.ACCENT_COLOR_TAG).orElse(-1);
+	}
+
+	@Override
+	public boolean hasAccentColor() {
+		return NBTHelper.hasTag(storageStack, StorageWrapper.ACCENT_COLOR_TAG);
+	}
+
 }

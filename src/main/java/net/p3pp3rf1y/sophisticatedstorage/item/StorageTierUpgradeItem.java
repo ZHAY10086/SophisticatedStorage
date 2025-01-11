@@ -309,9 +309,8 @@ public class StorageTierUpgradeItem extends ItemBase {
 				wbe.setWoodType(woodType);
 			}
 
-			if (color > -1) {
-				storageWrapper.setMainColor(color);
-				storageWrapper.setAccentColor(color);
+			if (color != -1) {
+				storageWrapper.setColors(color, color);
 			}
 		}
 	}
