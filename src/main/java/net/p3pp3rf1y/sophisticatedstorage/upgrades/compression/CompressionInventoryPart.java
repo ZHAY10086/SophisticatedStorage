@@ -286,7 +286,8 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 
 	@Override
 	public ItemStack extractItem(int slot, int amount, boolean simulate) {
-		return extractItem(slot, amount, simulate, ItemStack::getMaxStackSize);
+		//return extractItem(slot, amount, simulate, ItemStack::getMaxStackSize);
+		return extractItem(slot, amount, simulate, s -> Integer.MAX_VALUE); //!!! DON'T MERGE THIS TO ANY OTHER VERSION This limitation to max int is a bug introduced so that RS doesn't duplicate !!!
 	}
 
 	private ItemStack extractItem(int slot, int amount, boolean simulate, ToIntFunction<ItemStack> getLimit) {
