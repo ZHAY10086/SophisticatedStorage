@@ -93,6 +93,7 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 			HashMap<Direction, LazyOptional<?>> copy = new HashMap<>(map); //to prevent concurrent modification exception
 			copy.forEach((side, lazyOptional) -> lazyOptional.invalidate());
 		});
+		capabilitySideCache.clear();
 	}
 
 	@Override
@@ -165,9 +166,6 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 					.map(c -> getControllerCapability(cap, side, c))
 					.orElseGet(() -> super.getCapability(cap, side));
 			capabilitySideCache.computeIfAbsent(cap, k -> new HashMap<>()).put(side, lazyOptional);
-			if (lazyOptional.isPresent()) {
-				lazyOptional.addListener(l -> removeCapabilityCacheOnSide(cap, side));
-			}
 		}
 
 		return capabilitySideCache.get(cap).get(side).cast();
@@ -181,9 +179,22 @@ public class StorageIOBlockEntity extends BlockEntity implements IControllerBoun
 	}
 
 	protected <T> LazyOptional<T> getControllerCapability(Capability<T> cap, @Nullable Direction side, ControllerBlockEntity c) {
-		return c.getCapability(cap, side);
+		LazyOptional<T> controllerCap = c.getCapability(cap, getAdjustedCapabilitySide(cap, side));
+
+		return controllerCap.map(capability -> {
+			controllerCap.addListener(l -> removeCapabilityCacheOnSide(cap, side));
+			return LazyOptional.of(() -> wrapCapability(cap, capability));
+		}).orElseGet(LazyOptional::empty);
 	}
 
+	@Nullable
+	protected <T> Direction getAdjustedCapabilitySide(Capability<T> cap, @Nullable Direction side) {
+		return side;
+	}
+
+	protected <T> T wrapCapability(Capability<T> cap, T capability) {
+		return capability;
+	}
 
 	@Override
 	public void onChunkUnloaded() {

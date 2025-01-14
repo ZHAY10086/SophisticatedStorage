@@ -6,7 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.p3pp3rf1y.sophisticatedcore.inventory.IItemHandlerSimpleInserter;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
@@ -18,15 +17,25 @@ public class StorageOutputBlockEntity extends StorageIOBlockEntity {
 		super(ModBlocks.STORAGE_OUTPUT_BLOCK_ENTITY_TYPE.get(), pos, state);
 	}
 
+	@Nullable
 	@Override
-	protected <T> LazyOptional<T> getControllerCapability(Capability<T> cap, @Nullable Direction side, ControllerBlockEntity c) {
+	protected <T> Direction getAdjustedCapabilitySide(Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.ITEM_HANDLER) {
-				return c.getCapability(ForgeCapabilities.ITEM_HANDLER, null) //passing null side to not get the cache failed handler
-						.map(itemHandler -> LazyOptional.of(() -> itemHandler instanceof IItemHandlerSimpleInserter simpleInserter ? new OutputOnlyItemHandlerWrapper(simpleInserter) : itemHandler))
-						.orElseGet(LazyOptional::empty).cast();
+			return null; //passing null side to not get the cache failed handler from controller
 		}
 
-		return super.getControllerCapability(cap, side, c);
+		return super.getAdjustedCapabilitySide(cap, side);
+	}
+
+	@Override
+	protected <T> T wrapCapability(Capability<T> cap, T capability) {
+		if (cap == ForgeCapabilities.ITEM_HANDLER) {
+			if (capability instanceof IItemHandlerSimpleInserter) {
+				return (T) new OutputOnlyItemHandlerWrapper((IItemHandlerSimpleInserter) capability);
+			}
+		}
+
+		return super.wrapCapability(cap, capability);
 	}
 
 	private static class OutputOnlyItemHandlerWrapper implements IItemHandler {
