@@ -7,6 +7,7 @@ import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.compat.chipped.ChippedCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.quark.QuarkCompat;
 import net.p3pp3rf1y.sophisticatedstorage.compat.rubidium.RubidiumCompat;
+import net.p3pp3rf1y.sophisticatedstorage.compat.sb.SBCompat;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
@@ -20,6 +21,7 @@ public class ModCompat {
 	private ModCompat() {}
 
 	private static final String RUBIDIUM_MOD_ID = "rubidium";
+	private static final String SB_MOD_ID = "sophisticatedbackpacks";
 
 	private static final Map<CompatInfo, Supplier<Callable<ICompat>>> compatFactories = new HashMap<>();
 
@@ -29,6 +31,7 @@ public class ModCompat {
 		compatFactories.put(new CompatInfo(CompatModIds.QUARK, null), () -> QuarkCompat::new);
 		compatFactories.put(new CompatInfo(RUBIDIUM_MOD_ID, fromSpec("[0.6.5]")), () -> RubidiumCompat::new);
 		compatFactories.put(new CompatInfo(CompatModIds.CHIPPED, null), () -> ChippedCompat::new);
+		compatFactories.put(new CompatInfo(SB_MOD_ID, null), () -> SBCompat::new);
 	}
 
 	public static void compatsSetup() {
