@@ -14,7 +14,7 @@ import java.util.Map;
 public class SBCompat implements ICompat {
 	@Override
 	public void setup() {
-		DecorationTableBlockEntity.registerItemDecorator(BackpackItem.class, new DecorationTableBlockEntity.IItemDecorator() {
+		DecorationTableBlockEntity.registerItemDecorator(stack -> stack.getItem() instanceof BackpackItem, new DecorationTableBlockEntity.IItemDecorator() {
 			@Override
 			public boolean supportsMaterials(ItemStack input) {
 				return false;
