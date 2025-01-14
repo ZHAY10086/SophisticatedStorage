@@ -2,15 +2,19 @@ package net.p3pp3rf1y.sophisticatedstorage.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,6 +30,7 @@ import net.p3pp3rf1y.sophisticatedstorage.util.DecorationHelper;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DecorationTableBlockEntity extends BlockEntity {
@@ -42,10 +47,10 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	public static final Set<Item> STORAGES_WIHOUT_TOP_INNER_TRIM = Set.of(ModBlocks.BARREL_ITEM.get(), ModBlocks.COPPER_BARREL_ITEM.get(), ModBlocks.IRON_BARREL_ITEM.get(), ModBlocks.GOLD_BARREL_ITEM.get(), ModBlocks.DIAMOND_BARREL_ITEM.get(), ModBlocks.NETHERITE_BARREL_ITEM.get(),
 			ModBlocks.LIMITED_BARREL_1_ITEM.get(), ModBlocks.LIMITED_COPPER_BARREL_1_ITEM.get(), ModBlocks.LIMITED_IRON_BARREL_1_ITEM.get(), ModBlocks.LIMITED_GOLD_BARREL_1_ITEM.get(), ModBlocks.LIMITED_DIAMOND_BARREL_1_ITEM.get(), ModBlocks.LIMITED_NETHERITE_BARREL_1_ITEM.get());
 
-	private static final Map<Class<? extends Item>, IItemDecorator> ITEM_DECORATORS = new LinkedHashMap<>();
+	private static final Map<Predicate<ItemStack>, IItemDecorator> ITEM_DECORATORS = new LinkedHashMap<>();
 
-	public static void registerItemDecorator(Class<? extends Item> itemClass, IItemDecorator itemDecorator) {
-		ITEM_DECORATORS.put(itemClass, itemDecorator);
+	public static void registerItemDecorator(Predicate<ItemStack> itemMatcher, IItemDecorator itemDecorator) {
+		ITEM_DECORATORS.put(itemMatcher, itemDecorator);
 	}
 
 	private final Map<ResourceLocation, Integer> remainingParts = new HashMap<>();
@@ -103,7 +108,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 
 		@Override
 		public boolean isItemValid(int slot, ItemStack stack) {
-			return ITEM_DECORATORS.keySet().stream().anyMatch(clazz -> clazz.isInstance(stack.getItem()));
+			return ITEM_DECORATORS.keySet().stream().anyMatch(predicate -> predicate.test(stack));
 		}
 	};
 
@@ -124,7 +129,7 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	}
 
 	private static Optional<IItemDecorator> getItemDecorator(ItemStack input) {
-		return ITEM_DECORATORS.entrySet().stream().filter(e -> e.getKey().isInstance(input.getItem())).findFirst().map(Map.Entry::getValue);
+		return ITEM_DECORATORS.entrySet().stream().filter(e -> e.getKey().test(input)).findFirst().map(Map.Entry::getValue);
 	}
 
 	private TintDecorationResult decorateItem(IItemDecorator itemDecorator, ItemStack input) {
@@ -149,10 +154,12 @@ public class DecorationTableBlockEntity extends BlockEntity {
 		return getItemDecorator(input).map(itemDecorator -> {
 			List<ItemStack> previewStacks = new ArrayList<>();
 			itemDecorator.getPreviewStackInputs(input, hasMaterials()).forEach(stack -> {
-				TintDecorationResult decorationResult = decorateItem(itemDecorator, stack);
-				if (!decorationResult.result().isEmpty()) {
-					previewStacks.add(decorationResult.result());
-				}
+				getItemDecorator(stack).ifPresent(inputItemDecorator -> {
+					TintDecorationResult decorationResult = decorateItem(inputItemDecorator, stack);
+					if (!decorationResult.result().isEmpty()) {
+						previewStacks.add(decorationResult.result());
+					}
+				});
 			});
 			return previewStacks;
 		}).orElse(Collections.emptyList());
@@ -539,8 +546,8 @@ public class DecorationTableBlockEntity extends BlockEntity {
 	};
 
 	static {
-		ITEM_DECORATORS.put(StorageBlockItem.class, STORAGE_DECORATOR);
-		ITEM_DECORATORS.put(PaintbrushItem.class, new IItemDecorator() {
+		ITEM_DECORATORS.put(stack -> stack.getItem() instanceof StorageBlockItem, STORAGE_DECORATOR);
+		ITEM_DECORATORS.put(stack -> stack.getItem() instanceof PaintbrushItem, new IItemDecorator() {
 			@Override
 			public boolean consumesIngredientsOnCraft() {
 				return false;
@@ -598,6 +605,40 @@ public class DecorationTableBlockEntity extends BlockEntity {
 				}
 
 				return List.of(new ItemStack(ModBlocks.LIMITED_BARREL_3_ITEM.get()), new ItemStack(ModBlocks.CHEST_ITEM.get()), new ItemStack(ModBlocks.SHULKER_BOX_ITEM.get()));
+			}
+		});
+		ITEM_DECORATORS.put(stack -> stack.is(ItemTags.DYEABLE), new IItemDecorator() {
+			@Override
+			public boolean supportsMaterials(ItemStack input) {
+				return false;
+			}
+
+			@Override
+			public boolean supportsTints(ItemStack input) {
+				return true;
+			}
+
+			@Override
+			public boolean supportsTopInnerTrim(ItemStack input) {
+				return false;
+			}
+
+			@Override
+			public ItemStack decorateWithMaterials(ItemStack input, Map<BarrelMaterial, ResourceLocation> materialsToApply) {
+				return ItemStack.EMPTY;
+			}
+
+			@Override
+			public TintDecorationResult decorateWithTints(ItemStack input, int mainColorToSet, int accentColorToSet) {
+				int currentColor = DyedItemColor.getOrDefault(input, -1);
+				if (mainColorToSet == -1 || (currentColor == mainColorToSet)) {
+					return TintDecorationResult.EMPTY;
+				}
+
+				ItemStack result = input.copyWithCount(1);
+				result.set(DataComponents.DYED_COLOR, new DyedItemColor(FastColor.ARGB32.color(0, FastColor.ARGB32.red(mainColorToSet), FastColor.ARGB32.green(mainColorToSet), FastColor.ARGB32.blue(mainColorToSet)), true));
+
+				return new TintDecorationResult(result, DecorationHelper.getDyePartsNeeded(mainColorToSet, -1, currentColor, -1, 24, 0));
 			}
 		});
 	}
