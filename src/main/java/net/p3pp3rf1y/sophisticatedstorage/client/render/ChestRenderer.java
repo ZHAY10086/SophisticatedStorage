@@ -144,6 +144,18 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 				if (chestType == ChestType.LEFT) {
 					poseStack.translate(1, 0, 0);
 				}
+
+				if (chestEntity.showUpgradesOnTop) {
+					if (lidAngle > 0) {
+						poseStack.translate(0, 9/16D, 14/16D);
+						poseStack.mulPose(Axis.XP.rotationDegrees(lidAngle * 90));
+						poseStack.translate(0, -9/16D, -14/16D);
+					}
+					poseStack.translate(0.5, 0.5, (0.5 - 1 / 16f));
+					poseStack.mulPose(Axis.XP.rotationDegrees(90));
+					poseStack.translate(-0.5, -(0.5 - 1/16f),  -(0.5 - 2 / 16f));
+				}
+
 				displayItemRenderer.renderUpgradeItems(chestEntity, poseStack, bufferSource, packedLight, packedOverlay, holdsItemThatShowsUpgrades(), shouldShowDisabledUpgradesDisplay(chestEntity));
 				poseStack.popPose();
 			}
@@ -188,11 +200,6 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 
 	private void renderLocked(ChestBlockEntity chestEntity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, ChestType chestType, float lidAngle) {
 		poseStack.pushPose();
-		if (lidAngle > 0) {
-			poseStack.translate(0, 9/16D, 14/16D);
-			poseStack.mulPose(Axis.XP.rotationDegrees(lidAngle * 90));
-			poseStack.translate(0, -9/16D, -14/16D);
-		}
 		if (chestType == ChestType.LEFT) {
 			poseStack.translate(0.5, 0, 0);
 		} else if (chestType == ChestType.RIGHT) {
