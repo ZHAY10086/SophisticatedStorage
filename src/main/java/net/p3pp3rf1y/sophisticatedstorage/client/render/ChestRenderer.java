@@ -200,6 +200,11 @@ public class ChestRenderer extends StorageRenderer<ChestBlockEntity> {
 
 	private void renderLocked(ChestBlockEntity chestEntity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, ChestType chestType, float lidAngle) {
 		poseStack.pushPose();
+		if (lidAngle > 0) {
+			poseStack.translate(0, 9/16D, 14/16D);
+			poseStack.mulPose(Axis.XP.rotationDegrees(lidAngle * 90));
+			poseStack.translate(0, -9/16D, -14/16D);
+		}
 		if (chestType == ChestType.LEFT) {
 			poseStack.translate(0.5, 0, 0);
 		} else if (chestType == ChestType.RIGHT) {
