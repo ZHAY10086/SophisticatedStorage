@@ -43,10 +43,10 @@ public class WoodStorageBlockItem extends StorageBlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
-        super.appendHoverText(stack, context, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, tooltip, tooltipFlag);
         if (isPacked(stack)) {
-            if (flagIn == TooltipFlag.ADVANCED) {
+            if (tooltipFlag.isAdvanced()) {
                 HolderLookup.Provider registries = context.registries();
                 if (registries != null) {
                     StackStorageWrapper.fromStack(registries, stack).getContentsUuid().ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));
