@@ -226,10 +226,14 @@ public abstract class StorageBlockBase extends BlockBase implements IStorageBloc
 	}
 
 	public boolean tryAddSingleUpgrade(Player player, InteractionHand hand, StorageBlockEntity b, ItemStack itemInHand) {
+		return tryAddSingleUpgrade(player, hand, itemInHand, b.getStorageWrapper());
+	}
+
+	public static boolean tryAddSingleUpgrade(Player player, InteractionHand hand, ItemStack itemInHand, IStorageWrapper storageWrapper) {
 		if (itemInHand.getItem() instanceof UpgradeItemBase<?> upgradeItem
 				&& RegistryHelper.getRegistryName(BuiltInRegistries.ITEM, upgradeItem).map(r -> r.getNamespace().equals(SophisticatedStorage.MOD_ID)).orElse(false)) {
-			UpgradeHandler upgradeHandler = b.getStorageWrapper().getUpgradeHandler();
-			if (upgradeItem.canAddUpgradeTo(b.getStorageWrapper(), itemInHand, true, b.getLevel().isClientSide()).successful()
+			UpgradeHandler upgradeHandler = storageWrapper.getUpgradeHandler();
+			if (upgradeItem.canAddUpgradeTo(storageWrapper, itemInHand, true, player.level().isClientSide()).successful()
 					&& InventoryHelper.insertIntoInventory(itemInHand, upgradeHandler, true).getCount() != itemInHand.getCount()) {
 				InventoryHelper.insertIntoInventory(itemInHand.copyWithCount(1), upgradeHandler, false);
 				itemInHand.shrink(1);
