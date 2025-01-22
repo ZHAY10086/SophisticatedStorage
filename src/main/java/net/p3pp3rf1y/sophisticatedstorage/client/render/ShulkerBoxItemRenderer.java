@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.jarjar.nio.util.Lazy;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlock;
@@ -21,6 +22,7 @@ import net.p3pp3rf1y.sophisticatedstorage.block.ShulkerBoxBlockEntity;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
 public class ShulkerBoxItemRenderer extends BlockEntityWithoutLevelRenderer {
+	public static final Lazy<ShulkerBoxItemRenderer> SHULKER_BOX_ITEM_RENDERER = Lazy.of(() -> new ShulkerBoxItemRenderer(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels()));
 	private final BlockEntityRenderDispatcher blockEntityRenderDispatcher;
 	private final LoadingCache<BlockItem, ShulkerBoxBlockEntity> shulkerBoxBlockEntities = CacheBuilder.newBuilder().maximumSize(512L).weakKeys().build(new CacheLoader<>() {
 		@Override
@@ -33,7 +35,7 @@ public class ShulkerBoxItemRenderer extends BlockEntityWithoutLevelRenderer {
 		return new IClientItemExtensions() {
 			@Override
 			public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-				return new ShulkerBoxItemRenderer(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+				return SHULKER_BOX_ITEM_RENDERER.get();
 			}
 		};
 	}

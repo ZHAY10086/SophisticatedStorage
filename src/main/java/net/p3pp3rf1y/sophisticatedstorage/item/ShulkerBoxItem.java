@@ -37,9 +37,9 @@ public class ShulkerBoxItem extends StorageBlockItem implements IStashStorageIte
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlat) {
-		super.appendHoverText(stack, context, tooltip, tooltipFlat);
-		if (tooltipFlat.isAdvanced()) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag tooltipFlag) {
+		super.appendHoverText(stack, context, tooltip, tooltipFlag);
+		if (tooltipFlag.isAdvanced()) {
 			HolderLookup.Provider registries = context.registries();
 			if (registries != null) {
 				StackStorageWrapper.fromStack(registries, stack).getContentsUuid().ifPresent(uuid -> tooltip.add(Component.literal("UUID: " + uuid).withStyle(ChatFormatting.DARK_GRAY)));

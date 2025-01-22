@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.neoforged.jarjar.nio.util.Lazy;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlock;
 import net.p3pp3rf1y.sophisticatedstorage.block.ChestBlockEntity;
@@ -28,6 +29,7 @@ import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 import java.util.Optional;
 
 public class ChestItemRenderer extends BlockEntityWithoutLevelRenderer {
+	public static final Lazy<ChestItemRenderer> CHEST_ITEM_RENDERER = Lazy.of(() -> new ChestItemRenderer(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels()));
 	private final BlockEntityRenderDispatcher blockEntityRenderDispatcher;
 	private final LoadingCache<BlockItem, ChestBlockEntity> chestBlockEntities = CacheBuilder.newBuilder().maximumSize(512L).weakKeys().build(new CacheLoader<>() {
 		@Override
@@ -47,7 +49,7 @@ public class ChestItemRenderer extends BlockEntityWithoutLevelRenderer {
 		return new IClientItemExtensions() {
 			@Override
 			public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-				return new ChestItemRenderer(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+				return CHEST_ITEM_RENDERER.get();
 			}
 		};
 	}
