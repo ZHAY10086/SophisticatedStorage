@@ -7,10 +7,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.p3pp3rf1y.sophisticatedcore.upgrades.UpgradeItemBase;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
-import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
 import javax.annotation.Nullable;
@@ -30,10 +28,5 @@ public class ItemTagProvider extends ItemTagsProvider {
 
 		IntrinsicTagAppender<Item> allStorageTag = tag(ModBlocks.ALL_STORAGE_TAG);
 		ForgeRegistries.ITEMS.getEntries().stream().map(Map.Entry::getValue).filter(item -> item instanceof StorageBlockItem).forEach(allStorageTag::add);
-
-		IntrinsicTagAppender<Item> upgradeTag = tag(ModItems.STORAGE_UPGRADE_TAG);
-		ForgeRegistries.ITEMS.getEntries().stream()
-				.filter(entry -> entry.getKey().location().getNamespace().equals(SophisticatedStorage.MOD_ID) && entry.getValue() instanceof UpgradeItemBase)
-				.map(Map.Entry::getValue).forEach(upgradeTag::add);
 	}
 }
