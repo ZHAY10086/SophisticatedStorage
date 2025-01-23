@@ -1,6 +1,5 @@
 package net.p3pp3rf1y.sophisticatedstorage.block;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +22,6 @@ import net.p3pp3rf1y.sophisticatedcore.upgrades.stack.StackUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.util.InventorySorter;
 import net.p3pp3rf1y.sophisticatedcore.util.NBTHelper;
 import net.p3pp3rf1y.sophisticatedstorage.Config;
-import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
 import net.p3pp3rf1y.sophisticatedstorage.settings.StorageSettingsHandler;
 
@@ -124,7 +122,7 @@ public abstract class StorageWrapper implements IStorageWrapper {
 			}) {
 				@Override
 				public boolean isItemValid(int slot, ItemStack stack) {
-					return super.isItemValid(slot, stack) && (stack.isEmpty() || SophisticatedStorage.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(stack.getItem()).getNamespace()) || stack.is(ModItems.STORAGE_UPGRADE_TAG));
+					return super.isItemValid(slot, stack) && (stack.isEmpty() || stack.is(ModItems.STORAGE_UPGRADE_TAG));
 				}
 
 				@Override
