@@ -21,9 +21,13 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlock;
+import net.p3pp3rf1y.sophisticatedbackpacks.backpack.BackpackBlockEntity;
+import net.p3pp3rf1y.sophisticatedbackpacks.client.gui.SBPTranslationHelper;
 import net.p3pp3rf1y.sophisticatedcore.inventory.InventoryHandler;
 import net.p3pp3rf1y.sophisticatedcore.network.SyncPlayerSettingsPayload;
 import net.p3pp3rf1y.sophisticatedcore.settings.SettingsManager;
+import net.p3pp3rf1y.sophisticatedcore.upgrades.infinity.InfinityUpgradeItem;
 import net.p3pp3rf1y.sophisticatedcore.util.InventoryHelper;
 import net.p3pp3rf1y.sophisticatedcore.util.ItemBase;
 import net.p3pp3rf1y.sophisticatedcore.util.WorldHelper;
@@ -46,7 +50,8 @@ public class CommonEventHandler {
 		IEventBus eventBus = NeoForge.EVENT_BUS;
 		eventBus.addListener(this::onPlayerChangedDimension);
 		eventBus.addListener(this::onPlayerRespawn);
-		eventBus.addListener(this::onBlockBreak);
+		eventBus.addListener(this::handleTooManyDropsBreak);
+		eventBus.addListener(this::handleBreakBackpackWithInfinityUpgrade);
 		eventBus.addListener(this::onLimitedBarrelLeftClicked);
 		eventBus.addListener(this::onSneakItemBlockInteraction);
 		eventBus.addListener(this::onLevelTick);
@@ -116,7 +121,22 @@ public class CommonEventHandler {
 		}
 	}
 
-	private void onBlockBreak(BlockEvent.BreakEvent event) {
+	private void handleBreakBackpackWithInfinityUpgrade(BlockEvent.BreakEvent event) {
+		Player player = event.getPlayer();
+
+		if (player.hasPermissions(2) || !(event.getState().getBlock() instanceof StorageBlockBase)) {
+			return;
+		}
+
+		if (WorldHelper.getBlockEntity(event.getLevel(), event.getPos(), StorageBlockEntity.class)
+				.map(storageBlockEntity -> !storageBlockEntity.getStorageWrapper().getUpgradeHandler().getTypeWrappers(InfinityUpgradeItem.TYPE).isEmpty())
+				.orElse(false)) {
+			event.setCanceled(true);
+			player.displayClientMessage(StorageTranslationHelper.INSTANCE.translStatusMessage("infinity_upgrade_only_admin_break").withStyle(ChatFormatting.RED), true);
+		}
+	}
+
+	private void handleTooManyDropsBreak(BlockEvent.BreakEvent event) {
 		Player player = event.getPlayer();
 		if (!(event.getState().getBlock() instanceof WoodStorageBlockBase) || player.isShiftKeyDown()) {
 			return;
@@ -146,7 +166,7 @@ public class CommonEventHandler {
 					return;
 				}
 				droppedItemEntityCount.addAndGet((int) Math.ceil(stack.getCount() / (double) Math.min(stack.getMaxStackSize(), AVERAGE_MAX_ITEM_ENTITY_DROP_COUNT)));
-			});
+			}, () -> false, false);
 
 			if (droppedItemEntityCount.get() > Config.SERVER.tooManyItemEntityDrops.get()) {
 				event.setCanceled(true);
