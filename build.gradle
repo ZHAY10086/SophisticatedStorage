@@ -89,7 +89,6 @@ neoForge {
 
         client2 {
             client()
-
             programArguments.addAll '--username', 'Dev2'
         }
 
