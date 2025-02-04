@@ -98,6 +98,10 @@ public class StorageRecipeProvider extends RecipeProvider {
 		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_TIER_3.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_2.get());
 		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_TIER_4.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_3.get());
 		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_TIER_5.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_4.get());
+		addStorageStackUpgradeFromBackpackStackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_UPGRADE_OMEGA_TIER.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_OMEGA_TIER.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_DOWNGRADE_TIER_1.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_1.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_DOWNGRADE_TIER_2.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_2.get());
+		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.STACK_DOWNGRADE_TIER_3.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_3.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.PICKUP_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.PICKUP_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.ADVANCED_PICKUP_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_PICKUP_UPGRADE.get());
 		addStorageUpgradeFromBackpackUpgradeRecipe(sbConditionalRecipeOutput, ModItems.MAGNET_UPGRADE.get(), net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.MAGNET_UPGRADE.get());
@@ -126,6 +130,10 @@ public class StorageRecipeProvider extends RecipeProvider {
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_2.get(), ModItems.STACK_UPGRADE_TIER_3.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_3.get(), ModItems.STACK_UPGRADE_TIER_4.get());
 		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_TIER_4.get(), ModItems.STACK_UPGRADE_TIER_5.get());
+		addBackpackStackUpgradeFromStorageStackUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_UPGRADE_OMEGA_TIER.get(), ModItems.STACK_UPGRADE_OMEGA_TIER.get());
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_1.get(), ModItems.STACK_DOWNGRADE_TIER_1.get());
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_2.get(), ModItems.STACK_DOWNGRADE_TIER_2.get());
+		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.STACK_DOWNGRADE_TIER_3.get(), ModItems.STACK_DOWNGRADE_TIER_3.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.PICKUP_UPGRADE.get(), ModItems.PICKUP_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.ADVANCED_PICKUP_UPGRADE.get(), ModItems.ADVANCED_PICKUP_UPGRADE.get());
 		addBackpackUpgradeFromStorageUpgradeRecipe(sbConditionalRecipeOutput, net.p3pp3rf1y.sophisticatedbackpacks.init.ModItems.MAGNET_UPGRADE.get(), ModItems.MAGNET_UPGRADE.get());
@@ -788,7 +796,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_1.get())
 				.define('C', Tags.Items.INGOTS_COPPER)
 				.define('B', Tags.Items.STORAGE_BLOCKS_COPPER)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1.get()))
+				.unlockedBy("has_stack_upgrade_tier_1", has(ModItems.STACK_UPGRADE_TIER_1.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_2.get())
@@ -798,7 +806,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_1_PLUS.get())
 				.define('I', Tags.Items.INGOTS_IRON)
 				.define('B', Tags.Items.STORAGE_BLOCKS_IRON)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1_PLUS.get()))
+				.unlockedBy("has_stack_upgrade_tier_1_plus", has(ModItems.STACK_UPGRADE_TIER_1_PLUS.get()))
 				.save(recipeOutput, SophisticatedStorage.getRL("stack_upgrade_tier_2_from_tier_1_plus"));
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_2.get())
@@ -808,7 +816,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_1.get())
 				.define('I', Tags.Items.INGOTS_IRON)
 				.define('B', Tags.Items.STORAGE_BLOCKS_IRON)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_1.get()))
+				.unlockedBy("has_stack_upgrade_tier_1", has(ModItems.STACK_UPGRADE_TIER_1.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_3.get())
@@ -818,7 +826,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_2.get())
 				.define('G', Tags.Items.INGOTS_GOLD)
 				.define('B', Tags.Items.STORAGE_BLOCKS_GOLD)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_2.get()))
+				.unlockedBy("has_stack_upgrade_tier_2", has(ModItems.STACK_UPGRADE_TIER_2.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_4.get())
@@ -828,7 +836,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_3.get())
 				.define('D', Tags.Items.GEMS_DIAMOND)
 				.define('B', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_3.get()))
+				.unlockedBy("has_stack_upgrade_tier_3", has(ModItems.STACK_UPGRADE_TIER_3.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_TIER_5.get())
@@ -838,7 +846,45 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.define('S', ModItems.STACK_UPGRADE_TIER_4.get())
 				.define('N', Tags.Items.INGOTS_NETHERITE)
 				.define('B', Tags.Items.STORAGE_BLOCKS_NETHERITE)
-				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.STACK_UPGRADE_TIER_4.get()))
+				.unlockedBy("has_stack_upgrade_tier_4", has(ModItems.STACK_UPGRADE_TIER_4.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_UPGRADE_OMEGA_TIER.get())
+				.pattern("SSS")
+				.pattern("SSS")
+				.pattern("SSS")
+				.define('S', ModItems.STACK_UPGRADE_TIER_5.get())
+				.unlockedBy("has_stack_upgrade_tier_5", has(ModItems.STACK_UPGRADE_TIER_5.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_DOWNGRADE_TIER_1.get())
+				.pattern("SFS")
+				.pattern("SBS")
+				.pattern("FSF")
+				.define('S', Items.STICK)
+				.define('F', Items.FLINT)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_DOWNGRADE_TIER_2.get())
+				.pattern("FSF")
+				.pattern("SBS")
+				.pattern("FSF")
+				.define('S', Items.STICK)
+				.define('F', Items.FLINT)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
+				.save(recipeOutput);
+
+		ShapeBasedRecipeBuilder.shaped(ModItems.STACK_DOWNGRADE_TIER_3.get())
+				.pattern("SFS")
+				.pattern("FBF")
+				.pattern("FSF")
+				.define('S', Items.STICK)
+				.define('F', Items.FLINT)
+				.define('B', ModItems.UPGRADE_BASE.get())
+				.unlockedBy(HAS_UPGRADE_BASE_CRITERION_NAME, has(ModItems.UPGRADE_BASE.get()))
 				.save(recipeOutput);
 
 		ShapeBasedRecipeBuilder.shaped(ModItems.JUKEBOX_UPGRADE.get())

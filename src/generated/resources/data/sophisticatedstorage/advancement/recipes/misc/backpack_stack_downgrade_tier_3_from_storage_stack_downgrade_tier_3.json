@@ -1,17 +1,21 @@
 {
   "neoforge:conditions": [
     {
+      "type": "neoforge:mod_loaded",
+      "modid": "sophisticatedbackpacks"
+    },
+    {
       "type": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_4"
+      "itemRegistryName": "sophisticatedbackpacks:stack_downgrade_tier_3"
     }
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_stack_upgrade_tier_3": {
+    "has_storage_upgrade": {
       "conditions": {
         "items": [
           {
-            "items": "sophisticatedstorage:stack_upgrade_tier_3"
+            "items": "sophisticatedstorage:stack_downgrade_tier_3"
           }
         ]
       },
@@ -19,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sophisticatedstorage:stack_upgrade_tier_4"
+        "recipe": "sophisticatedstorage:backpack_stack_downgrade_tier_3_from_storage_stack_downgrade_tier_3"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -27,12 +31,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_stack_upgrade_tier_3"
+      "has_storage_upgrade"
     ]
   ],
   "rewards": {
     "recipes": [
-      "sophisticatedstorage:stack_upgrade_tier_4"
+      "sophisticatedstorage:backpack_stack_downgrade_tier_3_from_storage_stack_downgrade_tier_3"
     ]
   }
 }
