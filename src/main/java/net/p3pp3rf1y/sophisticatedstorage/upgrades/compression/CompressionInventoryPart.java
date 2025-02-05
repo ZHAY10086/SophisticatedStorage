@@ -225,7 +225,7 @@ public class CompressionInventoryPart implements IInventoryPartHandler {
 			RecipeHelper.UncompactingResult uncompactingResult = RecipeHelper.getUncompactingResult(currentItem);
 			if (uncompactingResult.getCompactUsingShape() == RecipeHelper.CompactingShape.NONE) {
 				Optional<RecipeHelper.UncompactingResult> decompressionResult = getDecompressionResultFromConfig(currentItem.getItem());
-				if (!currentItem.getComponents().isEmpty() || decompressionResult.isEmpty()) {
+				if (decompressionResult.isEmpty()) {
 					break;
 				}
 				uncompactingResult = decompressionResult.get();
