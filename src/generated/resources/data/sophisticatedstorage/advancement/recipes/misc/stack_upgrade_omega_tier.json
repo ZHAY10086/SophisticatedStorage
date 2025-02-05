@@ -2,16 +2,16 @@
   "neoforge:conditions": [
     {
       "type": "sophisticatedcore:item_enabled",
-      "itemRegistryName": "sophisticatedstorage:stack_upgrade_tier_4"
+      "itemRegistryName": "sophisticatedstorage:stack_upgrade_omega_tier"
     }
   ],
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_stack_upgrade_tier_3": {
+    "has_stack_upgrade_tier_5": {
       "conditions": {
         "items": [
           {
-            "items": "sophisticatedstorage:stack_upgrade_tier_3"
+            "items": "sophisticatedstorage:stack_upgrade_tier_5"
           }
         ]
       },
@@ -19,7 +19,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sophisticatedstorage:stack_upgrade_tier_4"
+        "recipe": "sophisticatedstorage:stack_upgrade_omega_tier"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -27,12 +27,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_stack_upgrade_tier_3"
+      "has_stack_upgrade_tier_5"
     ]
   ],
   "rewards": {
     "recipes": [
-      "sophisticatedstorage:stack_upgrade_tier_4"
+      "sophisticatedstorage:stack_upgrade_omega_tier"
     ]
   }
 }
