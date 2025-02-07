@@ -271,6 +271,64 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.save(recipeOutput, RegistryHelper.getItemKey(netheriteTierItem));
 	}
 
+	private void addDoubleChestTierUpgradeRecipes(RecipeOutput recipeOutput, BlockItem baseTierItem, BlockItem copperTierItem, BlockItem ironTierItem, BlockItem goldTierItem, BlockItem diamondTierItem, BlockItem netheriteTierItem) {
+		ShapeBasedRecipeBuilder.shaped(copperTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("CCC")
+				.pattern("CSC")
+				.pattern("CBC")
+				.define('C', Tags.Items.INGOTS_COPPER)
+				.define('B', Tags.Items.STORAGE_BLOCKS_COPPER)
+				.define('S', baseTierItem)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(baseTierItem).getPath(), has(baseTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(copperTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(ironTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("III")
+				.pattern("ISI")
+				.pattern("III")
+				.define('I', Tags.Items.INGOTS_IRON)
+				.define('S', copperTierItem)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(copperTierItem).getPath(), has(copperTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(ironTierItem).getPath() + "_from_" + RegistryHelper.getItemKey(copperTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(ironTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("III")
+				.pattern("ISI")
+				.pattern("IBI")
+				.define('I', Tags.Items.INGOTS_IRON)
+				.define('S', baseTierItem)
+				.define('B', Tags.Items.STORAGE_BLOCKS_IRON)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(baseTierItem).getPath(), has(baseTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(ironTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(goldTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("GGG")
+				.pattern("GSG")
+				.pattern("GBG")
+				.define('G', Tags.Items.INGOTS_GOLD)
+				.define('S', ironTierItem)
+				.define('B', Tags.Items.STORAGE_BLOCKS_GOLD)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(ironTierItem).getPath(), has(ironTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(goldTierItem).getPath()));
+
+		ShapeBasedRecipeBuilder.shaped(diamondTierItem, DoubleChestTierUpgradeRecipe::new)
+				.pattern("DDD")
+				.pattern("DSD")
+				.pattern("DBD")
+				.define('D', Tags.Items.GEMS_DIAMOND)
+				.define('S', goldTierItem)
+				.define('B', Tags.Items.STORAGE_BLOCKS_DIAMOND)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(goldTierItem).getPath(), has(goldTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(diamondTierItem).getPath()));
+
+		ShapelessBasedRecipeBuilder.shapeless(netheriteTierItem, DoubleChestTierUpgradeShapelessRecipe::new)
+				.requires(Ingredient.of(diamondTierItem))
+				.requires(Tags.Items.INGOTS_NETHERITE)
+				.requires(Tags.Items.INGOTS_NETHERITE)
+				.unlockedBy("has_" + RegistryHelper.getItemKey(diamondTierItem).getPath(), has(diamondTierItem))
+				.save(recipeOutput, SophisticatedStorage.getRL("double_" + RegistryHelper.getItemKey(netheriteTierItem).getPath()));
+	}
+
 	private void addControllerRelatedRecipes(RecipeOutput recipeOutput) {
 		ShapeBasedRecipeBuilder.shaped(ModBlocks.CONTROLLER_ITEM.get())
 				.pattern("SCS")
@@ -1102,6 +1160,7 @@ public class StorageRecipeProvider extends RecipeProvider {
 				.save(recipeOutput, SophisticatedStorage.getRL("oak_chest_from_vanilla_chest"));
 
 		addStorageTierUpgradeRecipes(recipeOutput, ModBlocks.CHEST_ITEM.get(), ModBlocks.COPPER_CHEST_ITEM.get(), ModBlocks.IRON_CHEST_ITEM.get(), ModBlocks.GOLD_CHEST_ITEM.get(), ModBlocks.DIAMOND_CHEST_ITEM.get(), ModBlocks.NETHERITE_CHEST_ITEM.get());
+		addDoubleChestTierUpgradeRecipes(recipeOutput, ModBlocks.CHEST_ITEM.get(), ModBlocks.COPPER_CHEST_ITEM.get(), ModBlocks.IRON_CHEST_ITEM.get(), ModBlocks.GOLD_CHEST_ITEM.get(), ModBlocks.DIAMOND_CHEST_ITEM.get(), ModBlocks.NETHERITE_CHEST_ITEM.get());
 
 		//addQuarkChestRecipes(recipeOutput); // TODO readd with quark compat
 	}

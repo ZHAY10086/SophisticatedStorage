@@ -4,7 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
@@ -16,16 +16,16 @@ import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
 import java.util.Optional;
 
-public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRecipe<ShapedRecipe> {
-	private final ShapedRecipe compose;
+public class DoubleChestTierUpgradeShapelessRecipe extends ShapelessRecipe implements IWrapperRecipe<ShapelessRecipe> {
+	private final ShapelessRecipe compose;
 
-	public StorageTierUpgradeRecipe(ShapedRecipe compose) {
-		super(compose.getGroup(), compose.category(), compose.pattern, compose.result);
+	public DoubleChestTierUpgradeShapelessRecipe(ShapelessRecipe compose) {
+		super(compose.getGroup(), compose.category(), compose.result, compose.getIngredients());
 		this.compose = compose;
 	}
 
 	@Override
-	public ShapedRecipe getCompose() {
+	public ShapelessRecipe getCompose() {
 		return compose;
 	}
 
@@ -37,13 +37,11 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 	@Override
 	public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
 		ItemStack upgradedStorage = super.assemble(input, registries);
-		getOriginalStorage(input).ifPresent(originalStorage -> {
-			upgradedStorage.applyComponents(originalStorage.getComponents());
-		});
+		getOriginalStorage(input).ifPresent(originalStorage -> upgradedStorage.applyComponents(originalStorage.getComponents()));
 		if (upgradedStorage.has(ModCoreDataComponents.STORAGE_UUID)) {
 			StackStorageWrapper storageWrapper = StackStorageWrapper.fromStack(registries, upgradedStorage);
-			StorageBlockItem.setNumberOfInventorySlots(upgradedStorage, storageWrapper.getDefaultNumberOfInventorySlots());
-			StorageBlockItem.setNumberOfUpgradeSlots(upgradedStorage, storageWrapper.getDefaultNumberOfUpgradeSlots());
+			StorageBlockItem.setNumberOfInventorySlots(upgradedStorage, storageWrapper.getDefaultNumberOfInventorySlots() * 2);
+			StorageBlockItem.setNumberOfUpgradeSlots(upgradedStorage, storageWrapper.getDefaultNumberOfUpgradeSlots() * 2);
 		}
 		return upgradedStorage;
 	}
@@ -53,11 +51,10 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 		return true;
 	}
 
-	private Optional<ItemStack> getOriginalStorage(CraftingInput input) {
-		for (int slot = 0; slot < input.size(); slot++) {
-			ItemStack slotStack = input.getItem(slot);
-			if (slotStack.getItem() instanceof StorageBlockItem
-					&& (!(slotStack.getItem() instanceof ChestBlockItem) || !ChestBlockItem.isDoubleChest(slotStack))) {
+	private Optional<ItemStack> getOriginalStorage(CraftingInput inv) {
+		for (int slot = 0; slot < inv.size(); slot++) {
+			ItemStack slotStack = inv.getItem(slot);
+			if (slotStack.getItem() instanceof ChestBlockItem && ChestBlockItem.isDoubleChest(slotStack)) {
 				return Optional.of(slotStack);
 			}
 		}
@@ -67,12 +64,12 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ModBlocks.STORAGE_TIER_UPGRADE_RECIPE_SERIALIZER.get();
+		return ModBlocks.DOUBLE_CHEST_TIER_UPGRADE_SHAPELESS_RECIPE_SERIALIZER.get();
 	}
 
-	public static class Serializer extends RecipeWrapperSerializer<ShapedRecipe, StorageTierUpgradeRecipe> {
+	public static class Serializer extends RecipeWrapperSerializer<ShapelessRecipe, DoubleChestTierUpgradeShapelessRecipe> {
 		public Serializer() {
-			super(StorageTierUpgradeRecipe::new, RecipeSerializer.SHAPED_RECIPE);
+			super(DoubleChestTierUpgradeShapelessRecipe::new, RecipeSerializer.SHAPELESS_RECIPE);
 		}
 	}
 }

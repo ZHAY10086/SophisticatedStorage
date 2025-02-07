@@ -24,8 +24,8 @@ import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageScreen;
 import net.p3pp3rf1y.sophisticatedstorage.client.gui.StorageSettingsScreen;
 import net.p3pp3rf1y.sophisticatedstorage.common.gui.StorageContainerMenu;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.BarrelSubtypeInterpreter;
+import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.ChestSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.ShulkerBoxSubtypeInterpreter;
-import net.p3pp3rf1y.sophisticatedstorage.compat.jei.subtypes.WoodStorageSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.ShulkerBoxFromVanillaShapelessRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModItems;
@@ -51,7 +51,7 @@ public class StoragePlugin implements IModPlugin {
 
 	@Override
 	public void registerItemSubtypes(ISubtypeRegistration registration) {
-		ISubtypeInterpreter<ItemStack> woodStorageNbtInterpreter = new WoodStorageSubtypeInterpreter();
+		ISubtypeInterpreter<ItemStack> chestNbtInterpreter = new ChestSubtypeInterpreter();
 		ISubtypeInterpreter<ItemStack> barrelNbtInterpreter = new BarrelSubtypeInterpreter();
 
 		registration.registerSubtypeInterpreter(ModBlocks.BARREL_ITEM.get(), barrelNbtInterpreter);
@@ -60,12 +60,12 @@ public class StoragePlugin implements IModPlugin {
 		registration.registerSubtypeInterpreter(ModBlocks.GOLD_BARREL_ITEM.get(), barrelNbtInterpreter);
 		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_BARREL_ITEM.get(), barrelNbtInterpreter);
 		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_BARREL_ITEM.get(), barrelNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.COPPER_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.IRON_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.GOLD_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_CHEST_ITEM.get(), woodStorageNbtInterpreter);
-		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_CHEST_ITEM.get(), woodStorageNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.CHEST_ITEM.get(), chestNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.COPPER_CHEST_ITEM.get(), chestNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.IRON_CHEST_ITEM.get(), chestNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.GOLD_CHEST_ITEM.get(), chestNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.DIAMOND_CHEST_ITEM.get(), chestNbtInterpreter);
+		registration.registerSubtypeInterpreter(ModBlocks.NETHERITE_CHEST_ITEM.get(), chestNbtInterpreter);
 
 		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_1_ITEM.get(), barrelNbtInterpreter);
 		registration.registerSubtypeInterpreter(ModBlocks.LIMITED_BARREL_2_ITEM.get(), barrelNbtInterpreter);
