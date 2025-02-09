@@ -137,7 +137,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		int thisSlots = thisInventoryHandler.getSlots();
 		int mainSlots = mainInventoryHandler.getSlots();
 		for (int slot = 0; slot < thisSlots && slot + originalNumberOfSlots < mainSlots; slot++) {
-			ItemStack slotStack = thisInventoryHandler.getStackInSlot(slot);
+			ItemStack slotStack = thisInventoryHandler.getSlotStack(slot);
 			if (!slotStack.isEmpty()) {
 				mainInventoryHandler.setStackInSlot(slot + originalNumberOfSlots, slotStack);
 			}
@@ -191,7 +191,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			int firstIndex = mainInventoryHandler.getSlots() / 2;
 
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlots(); slot++) {
-				ItemStack slotStack = mainInventoryHandler.getStackInSlot(slot);
+				ItemStack slotStack = mainInventoryHandler.getSlotStack(slot);
 				be.getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, slotStack.split(slotStack.getMaxStackSize()));
 			}
 
@@ -210,7 +210,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 			int firstIndex = mainInventoryHandler.getSlots() / 2;
 
 			for (int slot = firstIndex; slot < mainInventoryHandler.getSlots(); slot++) {
-				getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, mainInventoryHandler.getStackInSlot(slot));
+				getStorageWrapper().getInventoryHandler().setSlotStack(slot - firstIndex, mainInventoryHandler.getSlotStack(slot));
 				mainInventoryHandler.setSlotStack(slot, ItemStack.EMPTY);
 			}
 			int inventorySlotDiff = (mainBE.getBlockState().getBlock() instanceof StorageBlockBase storageBlock ? storageBlock.getNumberOfInventorySlots() : 0) - mainInventoryHandler.getSlots();
@@ -387,7 +387,7 @@ public class ChestBlockEntity extends WoodStorageBlockEntity {
 		List<ItemStack> dropItems = new ArrayList<>();
 
 		for (int slot = chestBlock.getNumberOfInventorySlots(); slot < invHandler.getSlots(); slot++) {
-			ItemStack slotStack = invHandler.getStackInSlot(slot);
+			ItemStack slotStack = invHandler.getSlotStack(slot);
 
 			if (!slotStack.isEmpty()) {
 				dropItems.add(slotStack.copy());
