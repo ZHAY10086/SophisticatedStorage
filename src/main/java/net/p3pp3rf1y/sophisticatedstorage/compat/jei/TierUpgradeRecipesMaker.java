@@ -1,7 +1,6 @@
 package net.p3pp3rf1y.sophisticatedstorage.compat.jei;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -11,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.p3pp3rf1y.sophisticatedcore.compat.jei.ClientRecipeHelper;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.subtypes.PropertyBasedSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.DoubleChestTierUpgradeRecipe;
 import net.p3pp3rf1y.sophisticatedstorage.crafting.DoubleChestTierUpgradeShapelessRecipe;
@@ -22,37 +22,39 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
 public class TierUpgradeRecipesMaker {
-	private TierUpgradeRecipesMaker() {}
+	private TierUpgradeRecipesMaker() {
+	}
 
-	public static List<RecipeHolder<CraftingRecipe>> getShapedCraftingRecipes() {
+	public static List<RecipeHolder<CraftingRecipe>> getShapedCraftingRecipes(Function<ItemStack, Optional<PropertyBasedSubtypeInterpreter>> subtypeInterpreterGetter) {
 		RecipeConstructor<StorageTierUpgradeRecipe> constructRecipe = (originalRecipe, ingredients, result) -> {
 			ShapedRecipePattern pattern = new ShapedRecipePattern(originalRecipe.getWidth(), originalRecipe.getHeight(), ingredients, Optional.empty());
 			return new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result);
 		};
-		List<RecipeHolder<CraftingRecipe>> craftingRecipes = getCraftingRecipes(constructRecipe, StorageTierUpgradeRecipe.class, TierUpgradeRecipesMaker::getStorageItems);
+		List<RecipeHolder<CraftingRecipe>> craftingRecipes = getCraftingRecipes(constructRecipe, StorageTierUpgradeRecipe.class, TierUpgradeRecipesMaker::getStorageItems, subtypeInterpreterGetter);
 		RecipeConstructor<DoubleChestTierUpgradeRecipe> constructDoubleChestRecipe = (originalRecipe, ingredients, result) -> {
 			ShapedRecipePattern pattern = new ShapedRecipePattern(originalRecipe.getWidth(), originalRecipe.getHeight(), ingredients, Optional.empty());
 			return new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result);
 		};
-		craftingRecipes.addAll(getCraftingRecipes(constructDoubleChestRecipe, DoubleChestTierUpgradeRecipe.class, TierUpgradeRecipesMaker::getDoubleChestItems));
+		craftingRecipes.addAll(getCraftingRecipes(constructDoubleChestRecipe, DoubleChestTierUpgradeRecipe.class, TierUpgradeRecipesMaker::getDoubleChestItems, subtypeInterpreterGetter));
 		return craftingRecipes;
 	}
 
-	public static List<RecipeHolder<CraftingRecipe>> getShapelessCraftingRecipes() {
+	public static List<RecipeHolder<CraftingRecipe>> getShapelessCraftingRecipes(Function<ItemStack, Optional<PropertyBasedSubtypeInterpreter>> getSubtypeInterpreter) {
 		RecipeConstructor<StorageTierUpgradeShapelessRecipe> constructRecipe = (originalRecipe, ingredients, result) -> new ShapelessRecipe("", CraftingBookCategory.MISC, result, ingredients);
-		List<RecipeHolder<CraftingRecipe>> craftingRecipes = getCraftingRecipes(constructRecipe, StorageTierUpgradeShapelessRecipe.class, TierUpgradeRecipesMaker::getStorageItems);
+		List<RecipeHolder<CraftingRecipe>> craftingRecipes = getCraftingRecipes(constructRecipe, StorageTierUpgradeShapelessRecipe.class, TierUpgradeRecipesMaker::getStorageItems, getSubtypeInterpreter);
 		RecipeConstructor<DoubleChestTierUpgradeShapelessRecipe> constructDoubleChestRecipe = (originalRecipe, ingredients, result) -> new ShapelessRecipe("", CraftingBookCategory.MISC, result, ingredients);
-		craftingRecipes.addAll(getCraftingRecipes(constructDoubleChestRecipe, DoubleChestTierUpgradeShapelessRecipe.class, TierUpgradeRecipesMaker::getDoubleChestItems));
+		craftingRecipes.addAll(getCraftingRecipes(constructDoubleChestRecipe, DoubleChestTierUpgradeShapelessRecipe.class, TierUpgradeRecipesMaker::getDoubleChestItems, getSubtypeInterpreter));
 		return craftingRecipes;
 	}
 
 	@NotNull
-	private static <T extends CraftingRecipe> List<RecipeHolder<CraftingRecipe>> getCraftingRecipes(RecipeConstructor<T> constructRecipe, Class<T> originalRecipeClass, Function<CraftingRecipe, List<ItemStack>> getStorageItems) {
+	private static <T extends CraftingRecipe> List<RecipeHolder<CraftingRecipe>> getCraftingRecipes(RecipeConstructor<T> constructRecipe, Class<T> originalRecipeClass,
+																									Function<CraftingRecipe, List<ItemStack>> getStorageItems,
+																									Function<ItemStack, Optional<PropertyBasedSubtypeInterpreter>> getSubtypeInterpreter) {
 		return ClientRecipeHelper.transformAllRecipesOfTypeIntoMultiple(RecipeType.CRAFTING, originalRecipeClass, recipe -> {
 			List<RecipeHolder<CraftingRecipe>> itemGroupRecipes = new ArrayList<>();
 			getStorageItems.apply(recipe).forEach(storageItem -> {
@@ -83,15 +85,16 @@ public class TierUpgradeRecipesMaker {
 					i++;
 				}
 				ItemStack result = ClientRecipeHelper.assemble(recipe, craftinginventory.asCraftInput());
-				ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "tier_upgrade_" + getItemPath(storageItem) + "_to_" + getItemPath(result) + result.getComponentsPatch().toString().toLowerCase(Locale.ROOT).replaceAll("[{\",}:>=@\\[\\]\\s]", "_"));
+				ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID,
+						"tier_upgrade_"
+								+ getSubtypeInterpreter.apply(storageItem).map(interpreter -> interpreter.getRegistrySanitizedItemString(storageItem)).orElse("")
+								+ "_to_"
+								+ getSubtypeInterpreter.apply(result).map(interpreter -> interpreter.getRegistrySanitizedItemString(result)).orElse("")
+				);
 				itemGroupRecipes.add(new RecipeHolder<>(id, constructRecipe.construct(recipe, ingredientsCopy, result)));
 			});
 			return itemGroupRecipes;
 		});
-	}
-
-	private static @NotNull String getItemPath(ItemStack storageItem) {
-		return BuiltInRegistries.ITEM.getKey(storageItem.getItem()).getPath();
 	}
 
 	private static List<ItemStack> getDoubleChestItems(CraftingRecipe recipe) {

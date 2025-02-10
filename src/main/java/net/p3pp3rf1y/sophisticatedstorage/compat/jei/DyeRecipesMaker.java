@@ -6,6 +6,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.p3pp3rf1y.sophisticatedcore.compat.jei.subtypes.PropertyBasedSubtypeInterpreter;
 import net.p3pp3rf1y.sophisticatedstorage.SophisticatedStorage;
 import net.p3pp3rf1y.sophisticatedstorage.block.ITintableBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.block.StorageBlockBase;
@@ -14,12 +15,13 @@ import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
 import net.p3pp3rf1y.sophisticatedstorage.item.WoodStorageBlockItem;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class DyeRecipesMaker {
 	private DyeRecipesMaker() {
 	}
 
-	public static List<RecipeHolder<CraftingRecipe>> getRecipes() {
+	public static List<RecipeHolder<CraftingRecipe>> getRecipes(Function<ItemStack, Optional<PropertyBasedSubtypeInterpreter>> getSubtypeInterpreter) {
 		List<RecipeHolder<CraftingRecipe>> recipes = new ArrayList<>();
 
 		Map<Item, ItemStack[]> blocks = new HashMap<>();
@@ -70,8 +72,8 @@ public class DyeRecipesMaker {
 		blocks.put(ModBlocks.LIMITED_DIAMOND_BARREL_4_ITEM.get(), getWoodStorageStacks(ModBlocks.LIMITED_DIAMOND_BARREL_4.get()));
 		blocks.put(ModBlocks.LIMITED_NETHERITE_BARREL_4_ITEM.get(), getWoodStorageStacks(ModBlocks.LIMITED_NETHERITE_BARREL_4.get()));
 
-		addSingleColorRecipes(recipes, blocks);
-		addMultipleColorsRecipe(recipes, blocks);
+		addSingleColorRecipes(recipes, blocks, getSubtypeInterpreter);
+		addMultipleColorsRecipe(recipes, blocks, getSubtypeInterpreter);
 
 		return recipes;
 	}
@@ -82,7 +84,7 @@ public class DyeRecipesMaker {
 		return ret.toArray(new ItemStack[0]);
 	}
 
-	private static void addMultipleColorsRecipe(List<RecipeHolder<CraftingRecipe>> recipes, Map<Item, ItemStack[]> items) {
+	private static void addMultipleColorsRecipe(List<RecipeHolder<CraftingRecipe>> recipes, Map<Item, ItemStack[]> items, Function<ItemStack, Optional<PropertyBasedSubtypeInterpreter>> getSubtypeInterpreter) {
 		items.forEach((block, stacks) -> {
 			NonNullList<Ingredient> ingredients = NonNullList.create();
 			ingredients.add(Ingredient.of(DyeColor.YELLOW.getTag()));
@@ -94,13 +96,13 @@ public class DyeRecipesMaker {
 				tintableBlockItem.setMainColor(result, DyeColor.YELLOW.getTextureDiffuseColor());
 				tintableBlockItem.setAccentColor(result, DyeColor.LIME.getTextureDiffuseColor());
 			}
-			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "multiple_colors");
+			ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, getSubtypeInterpreter.apply(result).map(i -> i.getRegistrySanitizedItemString(result)).orElse("multiple_color"));
 			ShapedRecipePattern pattern = new ShapedRecipePattern(3, 1, ingredients, Optional.empty());
 			recipes.add(new RecipeHolder<>(id, new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result)));
 		});
 	}
 
-	private static void addSingleColorRecipes(List<RecipeHolder<CraftingRecipe>> recipes, Map<Item, ItemStack[]> items) {
+	private static void addSingleColorRecipes(List<RecipeHolder<CraftingRecipe>> recipes, Map<Item, ItemStack[]> items, Function<ItemStack, Optional<PropertyBasedSubtypeInterpreter>> getSubtypeInterpreter) {
 		for (DyeColor color : DyeColor.values()) {
 			items.forEach((block, stacks) -> {
 				NonNullList<Ingredient> ingredients = NonNullList.create();
@@ -111,7 +113,7 @@ public class DyeRecipesMaker {
 					tintableBlockItem.setMainColor(result, color.getTextureDiffuseColor());
 					tintableBlockItem.setAccentColor(result, color.getTextureDiffuseColor());
 				}
-				ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, "single_color_" + color.getSerializedName());
+				ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SophisticatedStorage.MOD_ID, getSubtypeInterpreter.apply(result).map(i -> i.getRegistrySanitizedItemString(result)).orElse("single_color_" + color.getSerializedName()));
 				ShapedRecipePattern pattern = new ShapedRecipePattern(1, 2, ingredients, Optional.empty());
 				recipes.add(new RecipeHolder<>(id, new ShapedRecipe("", CraftingBookCategory.MISC, pattern, result)));
 			});
