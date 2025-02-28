@@ -213,6 +213,8 @@
   "item.sophisticatedstorage.chipped.alchemy_bench_upgrade.tooltip": "Chipped Alchemy Bench in an upgrade tab",
   "item.sophisticatedstorage.chipped.tinkering_table_upgrade": "Chipped: Tinkering Table Upgrade",
   "item.sophisticatedstorage.chipped.tinkering_table_upgrade.tooltip": "Chipped Tinkering Table in an upgrade tab",
+  "item.sophisticatedstorage.sawmill.sawmill_upgrade": "Sawmill Upgrade",
+  "item.sophisticatedstorage.sawmill.sawmill_upgrade.tooltip": "Saw in an upgrade tab",
   "gui.sophisticatedstorage.upgrades.hopper": "Hopper",
   "gui.sophisticatedstorage.upgrades.hopper.tooltip": "Hopper Settings",
   "gui.sophisticatedstorage.upgrades.advanced_hopper": "Adv. Hopper",

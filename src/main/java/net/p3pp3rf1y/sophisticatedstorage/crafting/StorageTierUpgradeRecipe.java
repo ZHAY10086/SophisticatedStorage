@@ -1,16 +1,16 @@
 package net.p3pp3rf1y.sophisticatedstorage.crafting;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.level.Level;
 import net.p3pp3rf1y.sophisticatedcore.crafting.IWrapperRecipe;
 import net.p3pp3rf1y.sophisticatedcore.crafting.RecipeWrapperSerializer;
 import net.p3pp3rf1y.sophisticatedcore.init.ModCoreDataComponents;
-import net.p3pp3rf1y.sophisticatedstorage.block.IStorageBlock;
 import net.p3pp3rf1y.sophisticatedstorage.init.ModBlocks;
+import net.p3pp3rf1y.sophisticatedstorage.item.ChestBlockItem;
 import net.p3pp3rf1y.sophisticatedstorage.item.StackStorageWrapper;
 import net.p3pp3rf1y.sophisticatedstorage.item.StorageBlockItem;
 
@@ -27,6 +27,11 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 	@Override
 	public ShapedRecipe getCompose() {
 		return compose;
+	}
+
+	@Override
+	public boolean matches(CraftingInput input, Level level) {
+		return super.matches(input, level) && getOriginalStorage(input).isPresent();
 	}
 
 	@Override
@@ -51,7 +56,8 @@ public class StorageTierUpgradeRecipe extends ShapedRecipe implements IWrapperRe
 	private Optional<ItemStack> getOriginalStorage(CraftingInput input) {
 		for (int slot = 0; slot < input.size(); slot++) {
 			ItemStack slotStack = input.getItem(slot);
-			if (slotStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof IStorageBlock) {
+			if (slotStack.getItem() instanceof StorageBlockItem
+					&& (!(slotStack.getItem() instanceof ChestBlockItem) || !ChestBlockItem.isDoubleChest(slotStack))) {
 				return Optional.of(slotStack);
 			}
 		}

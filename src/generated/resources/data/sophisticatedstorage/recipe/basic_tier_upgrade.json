@@ -12,7 +12,7 @@
       "item": "minecraft:redstone_torch"
     },
     "S": {
-      "item": "minecraft:stick"
+      "tag": "c:rods/wooden"
     }
   },
   "pattern": [
